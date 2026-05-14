@@ -15,7 +15,7 @@ public class GlobalExceptionHandler {
     private static final long serialVersionUID = 1L;
 
     @ExceptionHandler(ObjectNotFoundException.class)
-    public ResponseEntity<StandardError> objectNotFoundException(ObjectNotFoundException e, HttpServletRequest request){
+    public ResponseEntity<StandardError> objectNotFoundException(ObjectNotFoundException e, HttpServletRequest request) {
         String error = "Not Found";
         HttpStatus status = HttpStatus.NOT_FOUND;
         StandardError standardError = new StandardError(LocalDateTime.now(), status.value(), error, e.getMessage(), request.getRequestURI());
