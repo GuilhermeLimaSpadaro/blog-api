@@ -27,6 +27,17 @@ public class UserController {
         return ResponseEntity.created(uri).body(userCreated);
     }
 
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<Void> delete(@PathVariable String id) {
+        service.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping(value = "/{id}")
+    public ResponseEntity<UserDTO> update(@PathVariable String id, @RequestBody UserDTO user) {
+        return ResponseEntity.ok().body(service.update(id, user));
+    }
+
     @GetMapping(value = "/{id}")
     public ResponseEntity<UserDTO> findById(@PathVariable String id) {
         UserDTO user = service.findById(id);
