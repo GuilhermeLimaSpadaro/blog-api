@@ -2,11 +2,11 @@ package com.gspadaro.blogapi.exception;
 
 import java.io.Serial;
 
-public class ObjectNotFoundException extends RuntimeException {
+public class ResourceNotFoundException extends RuntimeException {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    public ObjectNotFoundException(String msg) {
+    public ResourceNotFoundException(String msg) {
         super(msg);
     }
 }
