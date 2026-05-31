@@ -1,27 +1,38 @@
 package com.gspadaro.blogapi.domain;
 
+import com.gspadaro.blogapi.dto.AuthorDTO;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
+@Document(collection = "post")
 public class Post implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    @Id
     private String id;
-    private LocalDateTime date;
+    private LocalDate date;
     private String title;
     private String body;
+    private AuthorDTO author;
+    private final List<Comment> comments = new ArrayList<>();
 
     public Post() {
     }
 
-    public Post(String id, LocalDateTime date, String title, String body) {
+    public Post(String id, LocalDate date, String title, String body, AuthorDTO author) {
         this.id = id;
         this.date = date;
         this.title = title;
         this.body = body;
+        this.author = author;
     }
 
     public String getId() {
@@ -32,11 +43,11 @@ public class Post implements Serializable {
         this.id = id;
     }
 
-    public LocalDateTime getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(LocalDateTime date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 
@@ -54,6 +65,18 @@ public class Post implements Serializable {
 
     public void setBody(String body) {
         this.body = body;
+    }
+
+    public AuthorDTO getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(AuthorDTO author) {
+        this.author = author;
+    }
+
+    public List<Comment> getComments() {
+        return comments;
     }
 
     @Override

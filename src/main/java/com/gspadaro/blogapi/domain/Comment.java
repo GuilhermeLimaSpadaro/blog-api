@@ -1,5 +1,7 @@
 package com.gspadaro.blogapi.domain;
 
+import org.springframework.data.annotation.Id;
+
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -9,9 +11,12 @@ public class Comment implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    @Id
     private String id;
     private String text;
     private LocalDateTime date;
+
+    private User author;
 
     public Comment() {
     }
@@ -44,6 +49,14 @@ public class Comment implements Serializable {
 
     public void setDate(LocalDateTime date) {
         this.date = date;
+    }
+
+    public User getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(User author) {
+        this.author = author;
     }
 
     @Override
