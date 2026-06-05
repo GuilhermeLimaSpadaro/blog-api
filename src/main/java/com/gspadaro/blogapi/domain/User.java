@@ -19,8 +19,8 @@ public class User implements Serializable {
     private String id;
     private String name;
     private String email;
-    @DBRef(lazy = true)
-    private final List<Post> posts = new ArrayList<>();
+    @DBRef
+    private List<Post> posts = new ArrayList<>();
 
     public User() {
     }

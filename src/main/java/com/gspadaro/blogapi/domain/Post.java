@@ -1,7 +1,7 @@
 package com.gspadaro.blogapi.domain;
 
-import com.gspadaro.blogapi.dto.AuthorDTO;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serial;
@@ -21,13 +21,14 @@ public class Post implements Serializable {
     private LocalDate date;
     private String title;
     private String body;
-    private AuthorDTO author;
+    @DBRef
+    private User author;
     private final List<Comment> comments = new ArrayList<>();
 
     public Post() {
     }
 
-    public Post(String id, LocalDate date, String title, String body, AuthorDTO author) {
+    public Post(String id, LocalDate date, String title, String body, User author) {
         this.id = id;
         this.date = date;
         this.title = title;
@@ -67,11 +68,11 @@ public class Post implements Serializable {
         this.body = body;
     }
 
-    public AuthorDTO getAuthor() {
+    public User getAuthor() {
         return author;
     }
 
-    public void setAuthor(AuthorDTO author) {
+    public void setAuthor(User author) {
         this.author = author;
     }
 

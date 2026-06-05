@@ -1,6 +1,9 @@
 package com.gspadaro.blogapi.controller;
 
-import com.gspadaro.blogapi.dto.UserDTO;
+import com.gspadaro.blogapi.dto.PostRequestDTO;
+import com.gspadaro.blogapi.dto.UserPostResponseDTO;
+import com.gspadaro.blogapi.dto.UserRequestDTO;
+import com.gspadaro.blogapi.dto.UserResponseDTO;
 import com.gspadaro.blogapi.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,8 +23,8 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<UserDTO> create(@RequestBody UserDTO userRequest) {
-        UserDTO userCreated = service.create(userRequest);
+    public ResponseEntity<UserResponseDTO> create(@RequestBody UserRequestDTO userRequest) {
+        UserResponseDTO userCreated = service.create(userRequest);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(userCreated.id()).toUri();
         return ResponseEntity.created(uri).body(userCreated);
@@ -34,18 +37,24 @@ public class UserController {
     }
 
     @PutMapping(value = "/{id}")
-    public ResponseEntity<UserDTO> update(@PathVariable String id, @RequestBody UserDTO user) {
+    public ResponseEntity<UserResponseDTO> update(@PathVariable String id, @RequestBody UserRequestDTO user) {
         return ResponseEntity.ok().body(service.update(id, user));
     }
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<UserDTO> findById(@PathVariable String id) {
-        UserDTO user = service.findById(id);
+    public ResponseEntity<UserResponseDTO> findById(@PathVariable String id) {
+        UserResponseDTO user = service.findById(id);
         return ResponseEntity.ok().body(user);
     }
 
     @GetMapping
-    public ResponseEntity<List<UserDTO>> findAll() {
+    public ResponseEntity<List<UserResponseDTO>> findAll() {
         return ResponseEntity.ok().body(service.findAll());
+    }
+
+    @GetMapping("/{id}/posts")
+    public ResponseEntity<UserPostResponseDTO> findPosts(@PathVariable String id) {
+        UserPostResponseDTO posts = service.findPosts(id);
+        return ResponseEntity.ok().body(posts);
     }
 }
