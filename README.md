@@ -34,7 +34,7 @@ src/main/java/com/gspadaro/blogapi
 
 ## Tratamento de exceções
 
-O projeto centraliza o tratamento de erros através de um `@RestControllerAdvice` (`GlobalExceptionHandler`), que intercepta exceções de negócio (como `ObjectNotFoundException`) e retorna uma resposta padronizada (`StandardError`), contendo:
+O projeto centraliza o tratamento de erros através de um `@RestControllerAdvice` (`GlobalHandlerException`), que intercepta exceções de negócio (como `ObjectNotFoundException`) e retorna uma resposta padronizada (`StandardError`), contendo:
 
 - Data e hora do erro
 - Status HTTP
@@ -46,13 +46,32 @@ O projeto centraliza o tratamento de erros através de um `@RestControllerAdvice
 
 ### Usuários (`/users`)
 
-| Método | Endpoint      | Descrição                    |
-|--------|---------------|-------------------------------|
-| POST   | `/users`      | Cria um novo usuário          |
-| GET    | `/users`      | Lista todos os usuários       |
-| GET    | `/users/{id}` | Busca um usuário pelo ID      |
-| PUT    | `/users/{id}` | Atualiza um usuário existente |
-| DELETE | `/users/{id}` | Remove um usuário             |
+| Método | Endpoint            | Descrição                            |
+|--------|---------------------|----------------------------------------|
+| POST   | `/users`             | Cria um novo usuário                  |
+| GET    | `/users`             | Lista todos os usuários               |
+| GET    | `/users/{id}`        | Busca um usuário pelo ID              |
+| PUT    | `/users/{id}`        | Atualiza um usuário existente         |
+| DELETE | `/users/{id}`        | Remove um usuário                     |
+| GET    | `/users/{id}/posts`  | Lista os posts publicados por um usuário |
+
+### Posts (`/posts`)
+
+| Método | Endpoint      | Descrição               |
+|--------|---------------|--------------------------|
+| GET    | `/posts`      | Lista todos os posts    |
+| GET    | `/posts/{id}` | Busca um post pelo ID   |
+| PUT    | `/posts/{id}` | Atualiza um post existente (título e corpo) |
+
+> Observação: por enquanto não há endpoint de criação (`POST`) nem remoção (`DELETE`) de posts, e comentários ainda não possuem endpoints próprios — os posts existentes são populados via `Instantiation` no perfil `test`.
+
+## Roadmap
+
+Funcionalidades planejadas para as próximas versões:
+
+- [ ] `POST /posts` — criação de novos posts
+- [ ] `DELETE /posts/{id}` — remoção de posts
+- [ ] Endpoints de comentários (`POST`, `GET`, `DELETE`)
 
 ## Executando o projeto
 
@@ -78,6 +97,6 @@ A aplicação estará disponível em `http://localhost:8080`.
 
 O projeto conta com uma classe `Instantiation`, ativada apenas no perfil `test`, que popula o banco com usuários e posts de exemplo ao iniciar a aplicação. Para utilizá-la, execute a aplicação com o perfil `test` ativo:
 
-```Bash
+```bash
 mvn spring-boot:run -Dspring-boot.run.profiles=test
 ```
