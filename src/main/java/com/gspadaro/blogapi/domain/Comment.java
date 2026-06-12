@@ -1,38 +1,27 @@
 package com.gspadaro.blogapi.domain;
 
-import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.Objects;
+import java.time.LocalDate;
 
 public class Comment implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Id
-    private String id;
     private String text;
-    private LocalDateTime date;
+    private LocalDate date;
 
     private User author;
 
     public Comment() {
     }
 
-    public Comment(String id, String text, LocalDateTime date) {
-        this.id = id;
+    public Comment(String text, LocalDate date, User author) {
         this.text = text;
         this.date = date;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
+        this.author = author;
     }
 
     public String getText() {
@@ -43,11 +32,11 @@ public class Comment implements Serializable {
         this.text = text;
     }
 
-    public LocalDateTime getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(LocalDateTime date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 
@@ -59,15 +48,4 @@ public class Comment implements Serializable {
         this.author = author;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        Comment comment = (Comment) o;
-        return Objects.equals(id, comment.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(id);
-    }
 }

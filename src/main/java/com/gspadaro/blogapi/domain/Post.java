@@ -23,7 +23,7 @@ public class Post implements Serializable {
     private String body;
     @DBRef
     private User author;
-    private final List<Comment> comments = new ArrayList<>();
+    private List<Comment> comments = new ArrayList<>();
 
     public Post() {
     }
