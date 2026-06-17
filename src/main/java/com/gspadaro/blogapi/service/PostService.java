@@ -16,21 +16,21 @@ import java.util.List;
 @Service
 public class PostService {
 
-    private PostRepository postRepository;
-    private UserRepository userRepository;
+    private final PostRepository postRepository;
+    private final UserRepository userRepository;
 
     public PostService(PostRepository postRepository, UserRepository userRepository) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
     }
 
-    public PostResponseDTO create(String id, PostRequestDTO request) {
+    public PostResponseDTO create(PostRequestDTO request) {
         Post newPost = new Post();
-        User userId = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
+        User author = userRepository.findById(request.authorId()).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
         newPost.setDate(request.date());
         newPost.setTitle(request.title());
         newPost.setBody(request.body());
-        newPost.setAuthor(userId);
+        newPost.setAuthor(author);
         Post savedPost = postRepository.save(newPost);
         return PostResponseDTO.from(savedPost);
     }
