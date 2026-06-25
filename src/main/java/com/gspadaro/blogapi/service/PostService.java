@@ -4,8 +4,6 @@ import com.gspadaro.blogapi.domain.Post;
 import com.gspadaro.blogapi.domain.User;
 import com.gspadaro.blogapi.dto.PostRequestDTO;
 import com.gspadaro.blogapi.dto.PostResponseDTO;
-import com.gspadaro.blogapi.dto.UserRequestDTO;
-import com.gspadaro.blogapi.dto.UserResponseDTO;
 import com.gspadaro.blogapi.exception.ResourceNotFoundException;
 import com.gspadaro.blogapi.repository.PostRepository;
 import com.gspadaro.blogapi.repository.UserRepository;
@@ -57,5 +55,10 @@ public class PostService {
     public List<PostResponseDTO> findAll() {
         List<Post> posts = postRepository.findAll();
         return posts.stream().map(PostResponseDTO::from).toList();
+    }
+
+    public List<PostResponseDTO> findPostByTitle(String title) {
+        List<Post> postsByTitle = postRepository.findByTitleContainingIgnoreCase(title);
+        return PostResponseDTO.from(postsByTitle);
     }
 }
