@@ -57,21 +57,24 @@ O projeto centraliza o tratamento de erros através de um `@RestControllerAdvice
 
 ### Posts (`/posts`)
 
-| Método | Endpoint      | Descrição               |
-|--------|---------------|--------------------------|
-| GET    | `/posts`      | Lista todos os posts    |
-| GET    | `/posts/{id}` | Busca um post pelo ID   |
-| PUT    | `/posts/{id}` | Atualiza um post existente (título e corpo) |
+| Método | Endpoint              | Descrição                              |
+|--------|-----------------------|------------------------------------------|
+| POST   | `/posts`               | Cria um novo post                       |
+| GET    | `/posts`               | Lista todos os posts                    |
+| GET    | `/posts/{id}`          | Busca um post pelo ID                   |
+| PUT    | `/posts/{id}`          | Atualiza um post existente (título e corpo) |
+| DELETE | `/posts/{id}`          | Remove um post                          |
+| GET    | `/posts/title/{title}` | Busca posts pelo título                 |
 
-> Observação: por enquanto não há endpoint de criação (`POST`) nem remoção (`DELETE`) de posts, e comentários ainda não possuem endpoints próprios — os posts existentes são populados via `Instantiation` no perfil `test`.
+> Observação: comentários ainda não possuem endpoints próprios — os posts existentes são populados via `Instantiation` no perfil `test`.
 
 ## Roadmap
 
 Funcionalidades planejadas para as próximas versões:
 
-- [ ] `POST /posts` — criação de novos posts
-- [ ] `DELETE /posts/{id}` — remoção de posts
 - [ ] Endpoints de comentários (`POST`, `GET`, `DELETE`)
+- [ ] Bean Validation nos DTOs de request
+- [ ] Autenticação
 
 ## Executando o projeto
 

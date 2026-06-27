@@ -1,6 +1,6 @@
 package com.gspadaro.blogapi.controller;
 
-import com.gspadaro.blogapi.dto.UserPostResponseDTO;
+import com.gspadaro.blogapi.dto.PostResponseDTO;
 import com.gspadaro.blogapi.dto.UserRequestDTO;
 import com.gspadaro.blogapi.dto.UserResponseDTO;
 import com.gspadaro.blogapi.service.UserService;
@@ -52,8 +52,8 @@ public class UserController {
     }
 
     @GetMapping("/{id}/posts")
-    public ResponseEntity<UserPostResponseDTO> findPostsByUserId(@PathVariable String id) {
-        UserPostResponseDTO posts = service.findPostsByUserId(id);
+    public ResponseEntity<List<PostResponseDTO>> findPostsByUserId(@PathVariable String id) {
+        List<PostResponseDTO> posts = service.findPostsByUserId(id);
         return ResponseEntity.ok().body(posts);
     }
 }
