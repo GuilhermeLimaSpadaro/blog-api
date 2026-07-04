@@ -1,7 +1,5 @@
 package com.gspadaro.blogapi.domain;
 
-import org.springframework.data.mongodb.core.mapping.DBRef;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -12,15 +10,23 @@ public class Comment implements Serializable {
 
     private String text;
     private LocalDate date;
-
     private User author;
 
     public Comment() {
     }
 
     public Comment(String text, LocalDate date, User author) {
+        if (text == null) {
+            throw new IllegalArgumentException("Text cannot be null");
+        }
         this.text = text;
+        if (date == null){
+            throw new IllegalArgumentException("Date cannot be null");
+        }
         this.date = date;
+        if (author == null){
+            throw new IllegalArgumentException("Author cannot be null");
+        }
         this.author = author;
     }
 
