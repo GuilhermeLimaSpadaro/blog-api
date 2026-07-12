@@ -1,6 +1,6 @@
 package com.gspadaro.blogapi.controller;
 
-import com.gspadaro.blogapi.dto.PostResponseDTO;
+import com.gspadaro.blogapi.dto.UserDetailsDTO;
 import com.gspadaro.blogapi.dto.UserRequestDTO;
 import com.gspadaro.blogapi.dto.UserResponseDTO;
 import com.gspadaro.blogapi.service.UserService;
@@ -22,11 +22,10 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<UserResponseDTO> create(@RequestBody UserRequestDTO userRequest) {
-        UserResponseDTO userCreated = service.create(userRequest);
-        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
-                .buildAndExpand(userCreated.id()).toUri();
-        return ResponseEntity.created(uri).body(userCreated);
+    public ResponseEntity<UserDetailsDTO> create(@RequestBody UserRequestDTO userRequest) {
+        UserDetailsDTO user = service.create(userRequest);
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(user.id()).toUri();
+        return ResponseEntity.created(uri).body(user);
     }
 
     @DeleteMapping(value = "/{id}")
@@ -49,11 +48,5 @@ public class UserController {
     @GetMapping
     public ResponseEntity<List<UserResponseDTO>> findAll() {
         return ResponseEntity.ok().body(service.findAll());
-    }
-
-    @GetMapping("/{id}/posts")
-    public ResponseEntity<List<PostResponseDTO>> findPostsByUserId(@PathVariable String id) {
-        List<PostResponseDTO> posts = service.findPostsByUserId(id);
-        return ResponseEntity.ok().body(posts);
     }
 }

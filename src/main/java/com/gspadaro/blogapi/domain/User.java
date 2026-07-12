@@ -1,13 +1,10 @@
 package com.gspadaro.blogapi.domain;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 @Document(collection = "user")
@@ -19,13 +16,13 @@ public class User implements Serializable {
     private String id;
     private String name;
     private String email;
-    @DBRef
-    private List<Post> posts = new ArrayList<>();
+    private String phone;
+    private String password;
 
     public User() {
     }
 
-    public User(String id, String name, String email) {
+    public User(String id, String name, String email, String phone, String password) {
         this.id = id;
         if (name == null) {
             throw new IllegalArgumentException("Name cannot be null");
@@ -35,6 +32,18 @@ public class User implements Serializable {
             throw new IllegalArgumentException("Email cannot be null");
         }
         this.email = email;
+        if (phone == null) {
+            throw new IllegalArgumentException("Phone cannot be null");
+        }
+        this.phone = phone;
+        if (password == null) {
+            throw new IllegalArgumentException("Password cannot be null");
+        }
+        this.password = password;
+    }
+
+    public User(String name, String email, String phone, String password) {
+        this(null, name, email, phone, password);
     }
 
     public String getId() {
@@ -61,8 +70,20 @@ public class User implements Serializable {
         this.email = email;
     }
 
-    public List<Post> getPosts() {
-        return posts;
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     @Override
