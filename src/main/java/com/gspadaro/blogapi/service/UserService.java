@@ -25,8 +25,21 @@ public class UserService {
         return UserDTO.from(savedUser);
     }
 
+    public void delete(String id) {
+        User user = repository.findById(id).orElseThrow(() -> new ObjectNotFoundException("Object not found"));
+        repository.delete(user);
+    }
+
+    public UserDTO update(String id, UserDTO user) {
+        User findUser = repository.findById(id).orElseThrow(() -> new ObjectNotFoundException("Object not found"));
+        findUser.setName(user.name());
+        findUser.setEmail(user.email());
+        User userUpdated = repository.save(findUser);
+        return UserDTO.from(userUpdated);
+    }
+
     public UserDTO findById(String id) {
-        User user = repository.findById(id).orElseThrow(() -> new ObjectNotFoundException("Resource not found"));
+        User user = repository.findById(id).orElseThrow(() -> new ObjectNotFoundException("Object not found"));
         return UserDTO.from(user);
     }
 
