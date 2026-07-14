@@ -1,33 +1,52 @@
 package com.gspadaro.blogapi.domain;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.LocalDate;
+import java.time.Instant;
+import java.util.Objects;
 
+@Document(collection = "comment")
 public class Comment implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    @Id
+    private String id;
     private String text;
-    private LocalDate date;
+    private Instant date = Instant.now();
+    @DBRef
     private User author;
+    @DBRef
+    private Post post;
 
     public Comment() {
     }
 
-    public Comment(String text, LocalDate date, User author) {
+    public Comment(String text, User author, Post post) {
         if (text == null) {
             throw new IllegalArgumentException("Text cannot be null");
         }
         this.text = text;
-        if (date == null){
-            throw new IllegalArgumentException("Date cannot be null");
-        }
-        this.date = date;
-        if (author == null){
+        if (author == null) {
             throw new IllegalArgumentException("Author cannot be null");
         }
         this.author = author;
+        if (post == null) {
+            throw new IllegalArgumentException("Post cannot be null");
+        }
+        this.post = post;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getText() {
@@ -38,11 +57,11 @@ public class Comment implements Serializable {
         this.text = text;
     }
 
-    public LocalDate getDate() {
+    public Instant getDate() {
         return date;
     }
 
-    public void setDate(LocalDate date) {
+    public void setDate(Instant date) {
         this.date = date;
     }
 
@@ -54,4 +73,23 @@ public class Comment implements Serializable {
         this.author = author;
     }
 
+    public Post getPost() {
+        return post;
+    }
+
+    public void setPost(Post post) {
+        this.post = post;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Comment comment = (Comment) o;
+        return Objects.equals(id, comment.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
 }
