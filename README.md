@@ -1,17 +1,11 @@
 # Blog API
 
-Uma API REST para um blog, construída com Spring Boot e MongoDB. Este projeto nasceu como um espaço para aprofundar, na prática, conceitos de backend que eu vinha estudando — modelagem de domínio, relacionamento entre documentos, padrões de arquitetura em camadas e boas práticas de versionamento.
+API REST para um sistema de blog, com suporte a usuários, posts e comentários, desenvolvida em Java com Spring Boot e persistência em MongoDB.
 
-## Sobre o projeto
-
-A Blog API é o back-end de uma plataforma de blog: usuários se cadastram, publicam posts e comentam nas publicações uns dos outros. A proposta é oferecer uma base sólida para esse tipo de aplicação — com um domínio bem definido de usuários, posts e comentários, e espaço para crescer com autenticação, paginação, busca e outras funcionalidades que um blog de verdade precisa conforme o projeto amadurece.
-
-A API expõe seus recursos por endpoints REST, separando claramente o que é entidade de domínio do que é exposto para quem consome a API, e mantendo a lógica de negócio isolada em uma camada de serviço.
-
-## Tecnologias utilizadas
+## Tecnologias
 
 - **Java 21**
-- **Spring Boot 3.5**
+- **Spring Boot**
 - **Spring Web**, para expor os endpoints REST
 - **Spring Data MongoDB**, para persistência
 - **MongoDB**
@@ -19,12 +13,71 @@ A API expõe seus recursos por endpoints REST, separando claramente o que é ent
 - **Maven**
 - **Git**
 
-## O que esse projeto me ensinou
+## Modelo de domínio
 
-Construir a Blog API foi, antes de tudo, um exercício de tirar dúvidas na prática em vez de só ler sobre elas. Foi aqui que entendi de verdade a diferença entre modelar relacionamentos em um banco relacional e em um banco de documentos, que fixei o padrão DTO com `record`, e que aprendi a manter um histórico de commits que realmente conta a história do desenvolvimento do projeto — não só uma sequência de "fix" e "update".
+- **User**: representa um usuário do blog, com nome e e-mail, podendo ser autor de posts e comentários.
+- **Post**: representa uma publicação, contendo título, corpo, data, autor (`User`) e uma lista de comentários.
+- **Comment**: representa um comentário associado a um post, contendo texto, data e autor (`User`).
 
-## Autor
+## Estrutura do projeto
 
-Guilherme Spadaro — desenvolvedor backend em transição de carreira, com foco em Java e Spring.
+```
+src/main/java/com/gspadaro/blogapi
+├── config          # Configurações e carga inicial de dados (perfil de teste)
+├── controller      # Controladores REST
+├── domain          # Entidades de domínio (documentos MongoDB)
+├── dto             # Objetos de transferência de dados (DTOs)
+├── exception       # Exceções customizadas e tratamento global de erros
+├── repository      # Repositórios Spring Data MongoDB
+└── service         # Regras de negócio
+```
 
-[GitHub](https://github.com/GuilhermeLimaSpadaro)
+## Tratamento de exceções
+
+O projeto centraliza o tratamento de erros através de um `@RestControllerAdvice` (`GlobalExceptionHandler`), que intercepta exceções de negócio (como `ObjectNotFoundException`) e retorna uma resposta padronizada (`StandardError`), contendo:
+
+- Data e hora do erro
+- Status HTTP
+- Descrição do erro
+- Mensagem detalhada
+- Caminho da requisição
+
+## Endpoints disponíveis
+
+### Usuários (`/users`)
+
+| Método | Endpoint      | Descrição                    |
+|--------|---------------|-------------------------------|
+| POST   | `/users`      | Cria um novo usuário          |
+| GET    | `/users`      | Lista todos os usuários       |
+| GET    | `/users/{id}` | Busca um usuário pelo ID      |
+| PUT    | `/users/{id}` | Atualiza um usuário existente |
+| DELETE | `/users/{id}` | Remove um usuário             |
+
+## Executando o projeto
+
+### Pré-requisitos
+
+- Java 21
+- Maven
+- MongoDB em execução (local ou remoto)
+
+### Configuração
+
+Configure a conexão com o MongoDB no arquivo `application.properties` ou `application.yml`.
+
+### Rodando a aplicação
+
+```bash
+mvn spring-boot:run
+```
+
+A aplicação estará disponível em `http://localhost:8080`.
+
+## Massa de dados de teste
+
+O projeto conta com uma classe `Instantiation`, ativada apenas no perfil `test`, que popula o banco com usuários e posts de exemplo ao iniciar a aplicação. Para utilizá-la, execute a aplicação com o perfil `test` ativo:
+
+```bash
+mvn spring-boot:run -Dspring-boot.run.profiles=test
+```
