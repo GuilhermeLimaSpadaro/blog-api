@@ -6,9 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.Instant;
 import java.util.Objects;
 
 @Document(collection = "post")
@@ -18,23 +16,20 @@ public class Post implements Serializable {
 
     @Id
     private String id;
-    private LocalDate date;
+    private Instant date;
     private String title;
     private String body;
     @DBRef
     private User author;
-    private List<Comment> comments = new ArrayList<>();
+
 
     public Post() {
     }
 
-    public Post(String id, LocalDate date, String title, String body, User author) {
+    public Post(String id, Instant date, String title, String body, User author) {
         this.id = id;
-        if (date == null) {
-            throw new IllegalArgumentException("Date cannot be null");
-        }
-        this.date = date;
-        if (title == null ) {
+        this.date = Instant.now();
+        if (title == null) {
             throw new IllegalArgumentException("Title cannot be null");
         }
         this.title = title;
@@ -48,6 +43,10 @@ public class Post implements Serializable {
         this.author = author;
     }
 
+    public Post(String title, String body, User author) {
+        this(null, null, title, body, author);
+    }
+
     public String getId() {
         return id;
     }
@@ -56,11 +55,11 @@ public class Post implements Serializable {
         this.id = id;
     }
 
-    public LocalDate getDate() {
+    public Instant getDate() {
         return date;
     }
 
-    public void setDate(LocalDate date) {
+    public void setDate(Instant date) {
         this.date = date;
     }
 
@@ -86,14 +85,6 @@ public class Post implements Serializable {
 
     public void setAuthor(User author) {
         this.author = author;
-    }
-
-    public List<Comment> getComments() {
-        return comments;
-    }
-
-    public void addComment(Comment comment) {
-        comments.add(comment);
     }
 
     @Override
