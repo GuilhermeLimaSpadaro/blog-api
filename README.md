@@ -64,7 +64,7 @@ O projeto centraliza o tratamento de erros através de um `@RestControllerAdvice
 
 ### Configuração
 
-Configure a conexão com o MongoDB no arquivo `application.properties` ou `application.yml`.
+Configure a conexão com o MongoDB no arquivo `application.properties`.
 
 ### Rodando a aplicação
 
@@ -74,10 +74,10 @@ mvn spring-boot:run
 
 A aplicação estará disponível em `http://localhost:8080`.
 
-## Massa de dados de teste
+## Dados de teste
 
 O projeto conta com uma classe `Instantiation`, ativada apenas no perfil `test`, que popula o banco com usuários e posts de exemplo ao iniciar a aplicação. Para utilizá-la, execute a aplicação com o perfil `test` ativo:
 
-```bash
+```Bash
 mvn spring-boot:run -Dspring-boot.run.profiles=test
 ```
