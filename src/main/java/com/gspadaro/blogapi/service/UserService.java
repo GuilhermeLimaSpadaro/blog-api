@@ -1,7 +1,9 @@
 package com.gspadaro.blogapi.service;
 
 import com.gspadaro.blogapi.domain.User;
-import com.gspadaro.blogapi.dto.UserDTO;
+import com.gspadaro.blogapi.dto.UserPostResponseDTO;
+import com.gspadaro.blogapi.dto.UserRequestDTO;
+import com.gspadaro.blogapi.dto.UserResponseDTO;
 import com.gspadaro.blogapi.exception.ResourceNotFoundException;
 import com.gspadaro.blogapi.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -11,40 +13,45 @@ import java.util.List;
 @Service
 public class UserService {
 
-    private UserRepository repository;
+    private final UserRepository repository;
 
     public UserService(UserRepository repository) {
         this.repository = repository;
     }
 
-    public UserDTO create(UserDTO request) {
+    public UserResponseDTO create(UserRequestDTO request) {
         User newUser = new User();
         newUser.setName(request.name());
         newUser.setEmail(request.email());
         User savedUser = repository.save(newUser);
-        return UserDTO.from(savedUser);
+        return UserResponseDTO.from(savedUser);
     }
 
     public void delete(String id) {
-        User user = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Object not found"));
+        User user = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
         repository.delete(user);
     }
 
-    public UserDTO update(String id, UserDTO request) {
-        User existingUser = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Object not found"));
+    public UserResponseDTO update(String id, UserRequestDTO request) {
+        User existingUser = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
         existingUser.setName(request.name());
         existingUser.setEmail(request.email());
         User updatedUser = repository.save(existingUser);
-        return UserDTO.from(updatedUser);
+        return UserResponseDTO.from(updatedUser);
     }
 
-    public UserDTO findById(String id) {
-        User user = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Object not found"));
-        return UserDTO.from(user);
+    public UserResponseDTO findById(String id) {
+        User user = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
+        return UserResponseDTO.from(user);
     }
 
-    public List<UserDTO> findAll() {
+    public UserPostResponseDTO findPosts(String id) {
+        User user = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
+        return UserPostResponseDTO.from(user);
+    }
+
+    public List<UserResponseDTO> findAll() {
         List<User> list = repository.findAll();
-        return list.stream().map(user -> UserDTO.from(user)).toList();
+        return list.stream().map(UserResponseDTO::from).toList();
     }
 }
