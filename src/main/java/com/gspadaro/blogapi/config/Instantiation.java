@@ -1,5 +1,6 @@
 package com.gspadaro.blogapi.config;
 
+import com.gspadaro.blogapi.domain.Comment;
 import com.gspadaro.blogapi.domain.Post;
 import com.gspadaro.blogapi.domain.User;
 import com.gspadaro.blogapi.repository.PostRepository;
@@ -35,14 +36,24 @@ public class Instantiation implements CommandLineRunner {
 
         userRepo.saveAll(List.of(maria, alex, bob));
 
-        Post post00 = new Post(null, LocalDate.now(ZoneOffset.UTC), "Burguer king meu fast food favorito", "Adoro burguer king. Abraços!", maria);
-        Post post01 = new Post(null, LocalDate.of(2018, 3, 21), "Partiu viagem", "Vou viajar para São Paulo. Abraços!", alex);
-        Post post02 = new Post(null, LocalDate.of(2018, 3, 23), "Bom dia", "Acordei feliz hoje!", bob);
+        Post post00 = new Post(null, LocalDate.now(ZoneOffset.UTC), "Burguer king meu fast food favorito", "Adoro burguer king. Abraços!", alex);
+        Post post01 = new Post(null, LocalDate.of(2018, 3, 21), "Partiu viagem", "Vou viajar para São Paulo. Abraços!", maria);
+        Post post02 = new Post(null, LocalDate.of(2018, 3, 23), "Bom dia", "Acordei feliz hoje!", maria);
 
         postRepo.saveAll(List.of(post00, post01, post02));
 
-        maria.getPosts().add(post00);
-        bob.getPosts().addAll(List.of(post01, post02));
+        Comment comment01 = new Comment("Boa viagem mano!", LocalDate.of(2018, 03, 21), alex);
+        Comment comment02 = new Comment("Aproveite!", LocalDate.of(2018, 03, 22), bob);
+        Comment comment03 = new Comment("Tenha um ótimo dia!", LocalDate.of(2018, 03, 23), alex);
+
+
+        post01.getComments().addAll(List.of(comment01, comment02));
+        post02.getComments().add(comment03);
+
+        postRepo.saveAll(List.of(post00, post01, post02));
+
+        alex.getPosts().add(post00);
+        maria.getPosts().addAll(List.of(post01, post02));
 
         userRepo.saveAll(List.of(maria, bob));
     }
