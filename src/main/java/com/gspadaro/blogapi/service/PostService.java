@@ -24,13 +24,13 @@ public class PostService {
         this.userRepository = userRepository;
     }
 
-    public PostResponseDTO create(String id, PostRequestDTO request) {
+    public PostResponseDTO create(PostRequestDTO request) {
         Post newPost = new Post();
-        User userId = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
+        User author = userRepository.findById(request.authorId()).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
         newPost.setDate(request.date());
         newPost.setTitle(request.title());
         newPost.setBody(request.body());
-        newPost.setAuthor(userId);
+        newPost.setAuthor(author);
         Post savedPost = postRepository.save(newPost);
         return PostResponseDTO.from(savedPost);
     }
