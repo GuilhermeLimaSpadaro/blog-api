@@ -2,10 +2,14 @@ package com.gspadaro.blogapi.controller;
 
 import com.gspadaro.blogapi.dto.PostRequestDTO;
 import com.gspadaro.blogapi.dto.PostResponseDTO;
+import com.gspadaro.blogapi.dto.UserRequestDTO;
+import com.gspadaro.blogapi.dto.UserResponseDTO;
 import com.gspadaro.blogapi.service.PostService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 
 @RequestMapping(value = "/posts")
@@ -16,6 +20,20 @@ public class PostController {
 
     public PostController(PostService service) {
         this.service = service;
+    }
+
+    @PostMapping
+    public ResponseEntity<PostResponseDTO> create(@PathVariable String id, @RequestBody PostRequestDTO postRequest) {
+        PostResponseDTO userCreated = service.create(id, postRequest);
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+                .buildAndExpand(userCreated.id()).toUri();
+        return ResponseEntity.created(uri).body(userCreated);
+    }
+
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<Void> delete(@PathVariable String id) {
+        service.delete(id);
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping(value = "/{id}")
