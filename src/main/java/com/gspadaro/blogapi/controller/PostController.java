@@ -14,7 +14,7 @@ import java.util.List;
 @RestController
 public class PostController {
 
-    private PostService service;
+    private final PostService service;
 
     public PostController(PostService service) {
         this.service = service;

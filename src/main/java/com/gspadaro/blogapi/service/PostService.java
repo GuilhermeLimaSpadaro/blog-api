@@ -16,8 +16,8 @@ import java.util.List;
 @Service
 public class PostService {
 
-    private PostRepository postRepository;
-    private UserRepository userRepository;
+    private final PostRepository postRepository;
+    private final UserRepository userRepository;
 
     public PostService(PostRepository postRepository, UserRepository userRepository) {
         this.postRepository = postRepository;
