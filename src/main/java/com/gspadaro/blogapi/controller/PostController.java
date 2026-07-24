@@ -48,4 +48,9 @@ public class PostController {
     public ResponseEntity<List<PostResponseDTO>> findAll() {
         return ResponseEntity.ok().body(service.findAll());
     }
+
+    @GetMapping(value = "/{title}")
+    public ResponseEntity<List<PostResponseDTO>> findPostByTitle(@PathVariable String title){
+        return ResponseEntity.ok().body(service.findPostByTitle(title));
+    }
 }
