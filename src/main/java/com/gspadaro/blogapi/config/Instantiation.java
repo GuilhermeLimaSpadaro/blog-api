@@ -42,13 +42,13 @@ public class Instantiation implements CommandLineRunner {
 
         postRepo.saveAll(List.of(post00, post01, post02));
 
-        Comment comment01 = new Comment("Boa viagem mano!", LocalDate.of(2018, 03, 21), alex);
-        Comment comment02 = new Comment("Aproveite!", LocalDate.of(2018, 03, 22), bob);
-        Comment comment03 = new Comment("Tenha um ótimo dia!", LocalDate.of(2018, 03, 23), alex);
+        Comment comment01 = new Comment("Boa viagem mano!", LocalDate.of(2018, 3, 21), alex);
+        Comment comment02 = new Comment("Aproveite!", LocalDate.of(2018, 3, 22), bob);
+        Comment comment03 = new Comment("Tenha um ótimo dia!", LocalDate.of(2018, 3, 23), alex);
 
-
-        post01.getComments().addAll(List.of(comment01, comment02));
-        post02.getComments().add(comment03);
+        post01.addComment(comment01);
+        post01.addComment(comment02);
+        post02.addComment(comment03);
 
         postRepo.saveAll(List.of(post00, post01, post02));
 

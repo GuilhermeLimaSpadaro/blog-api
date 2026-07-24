@@ -80,6 +80,10 @@ public class Post implements Serializable {
         return comments;
     }
 
+    public void addComment(Comment comment){
+        comments.add(comment);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
