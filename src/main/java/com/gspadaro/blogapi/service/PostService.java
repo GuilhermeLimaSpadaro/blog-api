@@ -42,6 +42,7 @@ public class PostService {
 
     public PostResponseDTO update(String id, PostRequestDTO request) {
         Post post = postRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
+        post.setDate(request.date());
         post.setTitle(request.title());
         post.setBody(request.body());
         postRepository.save(post);
