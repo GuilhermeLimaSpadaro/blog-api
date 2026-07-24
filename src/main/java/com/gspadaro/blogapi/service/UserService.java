@@ -3,7 +3,7 @@ package com.gspadaro.blogapi.service;
 
 import com.gspadaro.blogapi.domain.Post;
 import com.gspadaro.blogapi.domain.User;
-import com.gspadaro.blogapi.dto.UserPostResponseDTO;
+import com.gspadaro.blogapi.dto.PostResponseDTO;
 import com.gspadaro.blogapi.dto.UserRequestDTO;
 import com.gspadaro.blogapi.dto.UserResponseDTO;
 import com.gspadaro.blogapi.exception.ResourceNotFoundException;
@@ -50,9 +50,9 @@ public class UserService {
         return UserResponseDTO.from(user);
     }
 
-    public UserPostResponseDTO findPostsByUserId(String id) {
-        List<Post> post = postRepo.findByAuthorId(id);
-        return UserPostResponseDTO.from(post);
+    public List<PostResponseDTO> findPostsByUserId(String id) {
+        List<Post> post = postRepo.findByAuthor_Id(id);
+        return PostResponseDTO.from(post);
     }
 
 
