@@ -49,7 +49,7 @@ public class PostController {
         return ResponseEntity.ok().body(service.findAll());
     }
 
-    @GetMapping(value = "/{title}")
+    @GetMapping(value = "title/{title}")
     public ResponseEntity<List<PostResponseDTO>> findPostByTitle(@PathVariable String title){
         return ResponseEntity.ok().body(service.findPostByTitle(title));
     }
