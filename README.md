@@ -5,36 +5,44 @@ API REST para um sistema de blog, com suporte a usuários, posts e comentários,
 ## Tecnologias
 
 - **Java 21**
-- **Spring Boot**
+- **Spring Boot 4.0.7**
 - **Spring Web**, para expor os endpoints REST
 - **Spring Data MongoDB**, para persistência
 - **MongoDB**
-- **Spring Boot Test**, para a camada de testes
+- **Spring Boot Test** + **Mockito**, para a camada de testes
 - **Maven**
-- **Git**
 
 ## Modelo de domínio
 
-- **User**: representa um usuário do blog, com nome e e-mail, podendo ser autor de posts e comentários.
-- **Post**: representa uma publicação, contendo título, corpo, data, autor (`User`) e uma lista de comentários.
-- **Comment**: representa um comentário associado a um post, contendo texto, data e autor (`User`).
+- **User**: usuário do blog, com `id`, `name` e `email`. Pode ser autor de posts e comentários. Mantém a lista de `posts` como referência (`@DBRef`).
+- **Post**: publicação com `id`, `date`, `title`, `body`, autor (`User`, referenciado via `@DBRef`) e uma lista de `comments`.
+- **Comment**: comentário com `text`, `date` e autor (`User`). É armazenado **embutido** dentro do `Post` (não é uma coleção própria no MongoDB nem possui repositório ou controller dedicados).
+
+Todas as entidades validam seus campos obrigatórios no construtor, lançando `IllegalArgumentException` quando algum valor essencial é `null`.
 
 ## Estrutura do projeto
 
 ```
 src/main/java/com/gspadaro/blogapi
-├── config          # Configurações e carga inicial de dados (perfil de teste)
-├── controller      # Controladores REST
+├── config          # Configuração de carga inicial de dados (perfil "test")
+├── controller      # Controladores REST (User, Post)
 ├── domain          # Entidades de domínio (documentos MongoDB)
-├── dto             # Objetos de transferência de dados (DTOs)
+├── dto             # DTOs de request/response (records)
 ├── exception       # Exceções customizadas e tratamento global de erros
 ├── repository      # Repositórios Spring Data MongoDB
 └── service         # Regras de negócio
 ```
 
+As DTOs são `records` com métodos estáticos `from(...)` para converter entidades de domínio em DTOs de resposta — as entidades nunca são expostas diretamente pela API.
+
 ## Tratamento de exceções
 
-O projeto centraliza o tratamento de erros através de um `@RestControllerAdvice` (`GlobalHandlerException`), que intercepta exceções de negócio (como `ObjectNotFoundException`) e retorna uma resposta padronizada (`StandardError`), contendo:
+O projeto centraliza o tratamento de erros com um `@RestControllerAdvice` (`GlobalHandlerException`), que intercepta:
+
+- `ResourceNotFoundException` → `404 Not Found`
+- `IllegalArgumentException` → `400 Bad Request`
+
+Em ambos os casos, a resposta segue o formato padronizado `StandardError`, contendo:
 
 - Data e hora do erro
 - Status HTTP
@@ -46,27 +54,27 @@ O projeto centraliza o tratamento de erros através de um `@RestControllerAdvice
 
 ### Usuários (`/users`)
 
-| Método | Endpoint            | Descrição                            |
-|--------|---------------------|----------------------------------------|
-| POST   | `/users`             | Cria um novo usuário                  |
-| GET    | `/users`             | Lista todos os usuários               |
-| GET    | `/users/{id}`        | Busca um usuário pelo ID              |
-| PUT    | `/users/{id}`        | Atualiza um usuário existente         |
-| DELETE | `/users/{id}`        | Remove um usuário                     |
-| GET    | `/users/{id}/posts`  | Lista os posts publicados por um usuário |
+| Método | Endpoint             | Descrição                                |
+|--------|-----------------------|-------------------------------------------|
+| POST   | `/users`               | Cria um novo usuário                      |
+| GET    | `/users`               | Lista todos os usuários                   |
+| GET    | `/users/{id}`          | Busca um usuário pelo ID                  |
+| PUT    | `/users/{id}`          | Atualiza um usuário existente             |
+| DELETE | `/users/{id}`          | Remove um usuário                         |
+| GET    | `/users/{id}/posts`    | Lista os posts publicados por um usuário  |
 
 ### Posts (`/posts`)
 
-| Método | Endpoint              | Descrição                              |
-|--------|-----------------------|------------------------------------------|
-| POST   | `/posts`               | Cria um novo post                       |
-| GET    | `/posts`               | Lista todos os posts                    |
-| GET    | `/posts/{id}`          | Busca um post pelo ID                   |
-| PUT    | `/posts/{id}`          | Atualiza um post existente (título e corpo) |
-| DELETE | `/posts/{id}`          | Remove um post                          |
-| GET    | `/posts/title/{title}` | Busca posts pelo título                 |
+| Método | Endpoint                | Descrição                                     |
+|--------|---------------------------|-------------------------------------------------|
+| POST   | `/posts`                   | Cria um novo post                              |
+| GET    | `/posts`                   | Lista todos os posts                           |
+| GET    | `/posts/{id}`               | Busca um post pelo ID                          |
+| PUT    | `/posts/{id}`               | Atualiza um post existente (data, título e corpo) |
+| DELETE | `/posts/{id}`               | Remove um post                                 |
+| GET    | `/posts/title/{title}`     | Busca posts cujo título contém o termo informado (case-insensitive) |
 
-> Observação: comentários ainda não possuem endpoints próprios — os posts existentes são populados via `Instantiation` no perfil `test`.
+> **Observação:** comentários ainda não possuem endpoints próprios. Eles só existem hoje via dados de exemplo carregados pela classe `Instantiation` no perfil `test`.
 
 ## Roadmap
 
@@ -81,25 +89,29 @@ Funcionalidades planejadas para as próximas versões:
 ### Pré-requisitos
 
 - Java 21
-- Maven
+- Maven (ou o wrapper `./mvnw` incluso no projeto)
 - MongoDB em execução (local ou remoto)
 
 ### Configuração
 
-Configure a conexão com o MongoDB no arquivo `application.properties`.
+A aplicação já sobe com o perfil `test` ativo por padrão (definido em `application.properties`), que aponta para `mongodb://localhost:27017/blog_db` (arquivo `application-test.properties`). Ajuste essa URI se o seu MongoDB estiver em outro endereço.
 
 ### Rodando a aplicação
 
 ```bash
-mvn spring-boot:run
+./mvnw spring-boot:run
 ```
 
 A aplicação estará disponível em `http://localhost:8080`.
 
-## Dados de teste
+### Dados de teste
 
-O projeto conta com uma classe `Instantiation`, ativada apenas no perfil `test`, que popula o banco com usuários e posts de exemplo ao iniciar a aplicação. Para utilizá-la, execute a aplicação com o perfil `test` ativo:
+Como o perfil `test` já vem ativo por padrão, a classe `Instantiation` roda automaticamente ao iniciar a aplicação: ela limpa as coleções de usuários e posts e as repopula com usuários, posts e comentários de exemplo.
+
+## Testes
 
 ```bash
-mvn spring-boot:run -Dspring-boot.run.profiles=test
+./mvnw test
 ```
+
+O projeto conta com testes unitários da camada de serviço usando JUnit 5 e Mockito (ex.: `UserServiceTest`).
