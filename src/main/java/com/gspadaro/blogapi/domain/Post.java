@@ -30,9 +30,21 @@ public class Post implements Serializable {
 
     public Post(String id, LocalDate date, String title, String body, User author) {
         this.id = id;
+        if (date == null) {
+            throw new IllegalArgumentException("Date cannot be null");
+        }
         this.date = date;
+        if (title == null ) {
+            throw new IllegalArgumentException("Title cannot be null");
+        }
         this.title = title;
+        if (body == null) {
+            throw new IllegalArgumentException("Body cannot be null");
+        }
         this.body = body;
+        if (author == null) {
+            throw new IllegalArgumentException("Author cannot be null");
+        }
         this.author = author;
     }
 
@@ -80,7 +92,7 @@ public class Post implements Serializable {
         return comments;
     }
 
-    public void addComment(Comment comment){
+    public void addComment(Comment comment) {
         comments.add(comment);
     }
 
