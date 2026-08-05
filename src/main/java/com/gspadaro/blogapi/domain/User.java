@@ -27,7 +27,13 @@ public class User implements Serializable {
 
     public User(String id, String name, String email) {
         this.id = id;
+        if (name == null) {
+            throw new IllegalArgumentException("Name cannot be null");
+        }
         this.name = name;
+        if (email == null) {
+            throw new IllegalArgumentException("Email cannot be null");
+        }
         this.email = email;
     }
 
