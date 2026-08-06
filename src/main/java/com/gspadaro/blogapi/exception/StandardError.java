@@ -10,7 +10,7 @@ public class StandardError implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssZ", timezone = "UTC")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "UTC")
     private LocalDateTime timeStamp;
     private Integer status;
     private String error;
@@ -28,40 +28,16 @@ public class StandardError implements Serializable {
     public LocalDateTime getTimeStamp() {
         return timeStamp;
     }
-
-    public void setTimeStamp(LocalDateTime timeStamp) {
-        this.timeStamp = timeStamp;
-    }
-
     public Integer getStatus() {
         return status;
     }
-
-    public void setStatus(Integer status) {
-        this.status = status;
-    }
-
     public String getError() {
         return error;
     }
-
-    public void setError(String error) {
-        this.error = error;
-    }
-
     public String getMessage() {
         return message;
     }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
     public String getPath() {
         return path;
-    }
-
-    public void setPath(String path) {
-        this.path = path;
     }
 }
