@@ -22,10 +22,10 @@ public class PostController {
 
     @PostMapping
     public ResponseEntity<PostResponseDTO> create(@RequestBody PostRequestDTO postRequest) {
-        PostResponseDTO userCreated = service.create(postRequest);
+        PostResponseDTO postCreated = service.create(postRequest);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
-                .buildAndExpand(userCreated.id()).toUri();
-        return ResponseEntity.created(uri).body(userCreated);
+                .buildAndExpand(postCreated.id()).toUri();
+        return ResponseEntity.created(uri).body(postCreated);
     }
 
     @DeleteMapping(value = "/{id}")
