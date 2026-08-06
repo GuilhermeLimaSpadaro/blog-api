@@ -10,7 +10,7 @@ import java.util.List;
 public class UserMapper {
 
     public static User toEntity(UserRequestDTO request) {
-        return new User(request.name(), request.name(), request.email(), request.phone(), request.password());
+        return new User(request.name(), request.email(), request.phone(), request.password());
     }
 
     public static UserResponseDTO toResponseDTO(User user) {

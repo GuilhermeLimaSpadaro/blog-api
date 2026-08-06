@@ -40,6 +40,8 @@ public class UserService {
         User existingUser = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
         existingUser.setName(request.name());
         existingUser.setEmail(request.email());
+        existingUser.setPhone(request.phone());
+        existingUser.setPassword(request.password());
         User updatedUser = userRepository.save(existingUser);
         return UserMapper.toResponseDTO(updatedUser);
     }
