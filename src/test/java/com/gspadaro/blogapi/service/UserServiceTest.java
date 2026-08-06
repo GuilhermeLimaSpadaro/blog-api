@@ -4,15 +4,21 @@ import com.gspadaro.blogapi.domain.User;
 import com.gspadaro.blogapi.dto.UserRequestDTO;
 import com.gspadaro.blogapi.repository.PostRepository;
 import com.gspadaro.blogapi.repository.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.UUID;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.doReturn;
 
 @ExtendWith(MockitoExtension.class)
@@ -27,19 +33,44 @@ class UserServiceTest {
     @InjectMocks
     private UserService uService;
 
-    @Test
-    @DisplayName("Deve criar um usuario")
-    void create() {
+    @Captor
+    private ArgumentCaptor<User> userArgumentCaptor;
 
-        //Arrange
-        var saved = new User("1", "Guilherme", "guilhermespadaro@gmail.com");
-        doReturn(saved).when(uRepository).save(any());
-        var input = new UserRequestDTO("Guilherme", "guilhermespadaro@gmail.com");
-        //Act
-        var result = uService.create(input);
-        //Assert
-        assertEquals("1", result.id());
-        assertEquals("Guilherme", result.name());
-        assertEquals("guilhermespadaro@gmail.com", result.email());
+    @BeforeEach
+    void setUp() {
+
     }
+
+    @Nested
+    class create {
+
+        @Test
+        @DisplayName("Should create a user successfully.")
+        void shouldCreateAUserSuccessfully() {
+            //Arrange
+            var saved = new User(UUID.randomUUID().toString()
+                    , "Guilherme"
+                    , "guilhermespadaro@gmail.com"
+                    , "11955447766"
+                    , "13ABC234");
+            doReturn(saved).when(uRepository).save(userArgumentCaptor.capture());
+            var input = new UserRequestDTO("Guilherme",
+                    "guilhermespadaro@gmail.com"
+                    , "1177886655"
+                    , "22@@ABC66");
+            //Act
+            var output = uService.create(input);
+            //Assert
+            assertNotNull(output);
+            assertEquals(saved.getId(), output.id());
+            assertEquals(saved.getName(), output.name());
+
+            var userCaptured = userArgumentCaptor.getValue();
+            assertEquals(input.name(), userCaptured.getName());
+            assertEquals(input.email(), userCaptured.getEmail());
+            assertEquals(input.phone(), userCaptured.getPhone());
+        }
+    }
+
+
 }
