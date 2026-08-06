@@ -3,10 +3,9 @@ package com.gspadaro.blogapi.service;
 
 import com.gspadaro.blogapi.domain.Post;
 import com.gspadaro.blogapi.domain.User;
-import com.gspadaro.blogapi.dto.PostResponseDTO;
-import com.gspadaro.blogapi.dto.UserRequestDTO;
-import com.gspadaro.blogapi.dto.UserResponseDTO;
+import com.gspadaro.blogapi.dto.*;
 import com.gspadaro.blogapi.exception.ResourceNotFoundException;
+import com.gspadaro.blogapi.mapper.UserMapper;
 import com.gspadaro.blogapi.repository.PostRepository;
 import com.gspadaro.blogapi.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -16,48 +15,42 @@ import java.util.List;
 @Service
 public class UserService {
 
-    private final UserRepository userRepo;
-    private final PostRepository postRepo;
+    private final UserRepository userRepository;
 
-    public UserService(UserRepository userRepo, PostRepository postRepo) {
-        this.userRepo = userRepo;
-        this.postRepo = postRepo;
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
-    public UserResponseDTO create(UserRequestDTO request) {
-        User newUser = new User();
-        newUser.setName(request.name());
-        newUser.setEmail(request.email());
-        User savedUser = userRepo.save(newUser);
-        return UserResponseDTO.from(savedUser);
+    public UserDetailsDTO create(UserRequestDTO request) {
+        User user = new User();
+        user.setName(request.name());
+        user.setEmail(request.email());
+        user.setPhone(request.phone());
+        user.setPassword(request.password());
+        User savedUser = userRepository.save(user);
+        return UserMapper.toDetailsDTO(savedUser);
     }
 
     public void delete(String id) {
-        User user = userRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
-        userRepo.delete(user);
+        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
+        userRepository.delete(user);
     }
 
     public UserResponseDTO update(String id, UserRequestDTO request) {
-        User existingUser = userRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
+        User existingUser = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
         existingUser.setName(request.name());
         existingUser.setEmail(request.email());
-        User updatedUser = userRepo.save(existingUser);
-        return UserResponseDTO.from(updatedUser);
+        User updatedUser = userRepository.save(existingUser);
+        return UserMapper.toResponseDTO(updatedUser);
     }
 
     public UserResponseDTO findById(String id) {
-        User user = userRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
-        return UserResponseDTO.from(user);
+        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
+        return new UserResponseDTO(user.getId(), user.getName(), user.getEmail(), user.getPhone());
     }
-
-    public List<PostResponseDTO> findPostsByUserId(String id) {
-        List<Post> post = postRepo.findByAuthor_Id(id);
-        return PostResponseDTO.from(post);
-    }
-
 
     public List<UserResponseDTO> findAll() {
-        List<User> list = userRepo.findAll();
-        return list.stream().map(UserResponseDTO::from).toList();
+        List<User> list = userRepository.findAll();
+        return list.stream().map(UserMapper::toResponseDTO).toList();
     }
 }

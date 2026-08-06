@@ -2,9 +2,12 @@ package com.gspadaro.blogapi.service;
 
 import com.gspadaro.blogapi.domain.Post;
 import com.gspadaro.blogapi.domain.User;
+import com.gspadaro.blogapi.dto.CommentResponseDTO;
 import com.gspadaro.blogapi.dto.PostRequestDTO;
 import com.gspadaro.blogapi.dto.PostResponseDTO;
+import com.gspadaro.blogapi.dto.UserResponseDTO;
 import com.gspadaro.blogapi.exception.ResourceNotFoundException;
+import com.gspadaro.blogapi.mapper.PostMapper;
 import com.gspadaro.blogapi.repository.PostRepository;
 import com.gspadaro.blogapi.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -30,7 +33,7 @@ public class PostService {
         newPost.setBody(request.body());
         newPost.setAuthor(author);
         Post savedPost = postRepository.save(newPost);
-        return PostResponseDTO.from(savedPost);
+        return PostMapper.toResponseDTO(savedPost);
     }
 
     public void delete(String id) {
@@ -43,22 +46,27 @@ public class PostService {
         post.setDate(request.date());
         post.setTitle(request.title());
         post.setBody(request.body());
-        postRepository.save(post);
-        return PostResponseDTO.from(post);
+        Post updatedPost = postRepository.save(post);
+        return PostMapper.toResponseDTO(updatedPost);
     }
 
     public PostResponseDTO findById(String id) {
         Post post = postRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
-        return PostResponseDTO.from(post);
+        return PostMapper.toResponseDTO(post);
     }
 
-    public List<PostResponseDTO> findAll() {
-        List<Post> posts = postRepository.findAll();
-        return posts.stream().map(PostResponseDTO::from).toList();
+    public List<PostResponseDTO> findPostsByUserId(String id) {
+        List<Post> postList = postRepository.findByAuthorId(id);
+        return postList.stream().map(PostMapper::toResponseDTO).toList();
     }
 
     public List<PostResponseDTO> findPostByTitle(String title) {
-        List<Post> postsByTitle = postRepository.findByTitleContainingIgnoreCase(title);
-        return PostResponseDTO.from(postsByTitle);
+        List<Post> postList = postRepository.findByTitleContainingIgnoreCase(title);
+        return PostMapper.toList(postList);
+    }
+
+    public List<PostResponseDTO> findAll() {
+        List<Post> postList = postRepository.findAll();
+        return PostMapper.toList(postList);
     }
 }
