@@ -12,7 +12,7 @@ import java.util.List;
 public class PostMapper {
 
     public static Post toEntity(PostRequestDTO request, User user) {
-        return new Post(request.date(), request.title(), request.body(), user);
+        return new Post(request.title(), request.body(), user);
     }
 
     public static PostResponseDTO toResponseDTO(Post post) {

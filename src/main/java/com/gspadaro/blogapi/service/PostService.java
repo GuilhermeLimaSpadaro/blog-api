@@ -10,6 +10,7 @@ import com.gspadaro.blogapi.repository.PostRepository;
 import com.gspadaro.blogapi.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -26,7 +27,7 @@ public class PostService {
     public PostResponseDTO create(PostRequestDTO request) {
         Post newPost = new Post();
         User author = userRepository.findById(request.authorId()).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
-        newPost.setDate(request.date());
+        newPost.setDate(LocalDateTime.now());
         newPost.setTitle(request.title());
         newPost.setBody(request.body());
         newPost.setAuthor(author);
@@ -41,7 +42,7 @@ public class PostService {
 
     public PostResponseDTO update(String id, PostRequestDTO request) {
         Post post = postRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
-        post.setDate(request.date());
+        post.setDate(LocalDateTime.now());
         post.setTitle(request.title());
         post.setBody(request.body());
         Post updatedPost = postRepository.save(post);
