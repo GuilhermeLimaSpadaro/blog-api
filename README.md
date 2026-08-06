@@ -14,7 +14,7 @@ API REST para um sistema de blog, com suporte a usuários, posts e comentários,
 
 ## Modelo de domínio
 
-- **User**: usuário do blog, com `id`, `name` e `email`. Pode ser autor de posts e comentários. Mantém a lista de `posts` como referência (`@DBRef`).
+- **User**: usuário do blog, com `id`, `name`, `email`, `phone` e `password`. Pode ser autor de posts e comentários. Mantém a lista de `posts` como referência (`@DBRef`).
 - **Post**: publicação com `id`, `date`, `title`, `body`, autor (`User`, referenciado via `@DBRef`) e uma lista de `comments`.
 - **Comment**: comentário com `text`, `date` e autor (`User`). É armazenado **embutido** dentro do `Post` (não é uma coleção própria no MongoDB nem possui repositório ou controller dedicados).
 
@@ -29,11 +29,12 @@ src/main/java/com/gspadaro/blogapi
 ├── domain          # Entidades de domínio (documentos MongoDB)
 ├── dto             # DTOs de request/response (records)
 ├── exception       # Exceções customizadas e tratamento global de erros
+├── mapper          # Conversão entre entidades e DTOs
 ├── repository      # Repositórios Spring Data MongoDB
 └── service         # Regras de negócio
 ```
 
-As DTOs são `records` com métodos estáticos `from(...)` para converter entidades de domínio em DTOs de resposta — as entidades nunca são expostas diretamente pela API.
+As DTOs são `records` — as entidades nunca são expostas diretamente pela API.
 
 ## Tratamento de exceções
 
@@ -54,35 +55,39 @@ Em ambos os casos, a resposta segue o formato padronizado `StandardError`, conte
 
 ### Usuários (`/users`)
 
-| Método | Endpoint             | Descrição                                |
-|--------|-----------------------|-------------------------------------------|
-| POST   | `/users`               | Cria um novo usuário                      |
-| GET    | `/users`               | Lista todos os usuários                   |
-| GET    | `/users/{id}`          | Busca um usuário pelo ID                  |
-| PUT    | `/users/{id}`          | Atualiza um usuário existente             |
-| DELETE | `/users/{id}`          | Remove um usuário                         |
-| GET    | `/users/{id}/posts`    | Lista os posts publicados por um usuário  |
+| Método | Endpoint       | Descrição                     |
+|--------|----------------|--------------------------------|
+| POST   | `/users`       | Cria um novo usuário           |
+| GET    | `/users`       | Lista todos os usuários        |
+| GET    | `/users/{id}`  | Busca um usuário pelo ID       |
+| PUT    | `/users/{id}`  | Atualiza um usuário existente  |
+| DELETE | `/users/{id}`  | Remove um usuário              |
 
 ### Posts (`/posts`)
 
-| Método | Endpoint                | Descrição                                     |
-|--------|---------------------------|-------------------------------------------------|
-| POST   | `/posts`                   | Cria um novo post                              |
-| GET    | `/posts`                   | Lista todos os posts                           |
-| GET    | `/posts/{id}`               | Busca um post pelo ID                          |
-| PUT    | `/posts/{id}`               | Atualiza um post existente (data, título e corpo) |
-| DELETE | `/posts/{id}`               | Remove um post                                 |
-| GET    | `/posts/title/{title}`     | Busca posts cujo título contém o termo informado (case-insensitive) |
+| Método | Endpoint             | Descrição                                                             |
+|--------|-----------------------|-------------------------------------------------------------------------|
+| POST   | `/posts`               | Cria um novo post                                                      |
+| GET    | `/posts`               | Lista todos os posts                                                   |
+| GET    | `/posts/{id}`           | Busca um post pelo ID                                                  |
+| PUT    | `/posts/{id}`           | Atualiza um post existente (data, título e corpo)                     |
+| DELETE | `/posts/{id}`           | Remove um post                                                         |
+| GET    | `/posts/users/{id}`     | Lista os posts publicados por um usuário                              |
+| GET    | `/posts/title/{title}`  | Busca posts cujo título contém o termo informado (case-insensitive)   |
 
 > **Observação:** comentários ainda não possuem endpoints próprios. Eles só existem hoje via dados de exemplo carregados pela classe `Instantiation` no perfil `test`.
 
 ## Roadmap
 
-Funcionalidades planejadas para as próximas versões:
-
-- [ ] Endpoints de comentários (`POST`, `GET`, `DELETE`)
-- [ ] Bean Validation nos DTOs de request
-- [ ] Autenticação
+- [x] CRUD de posts e usuários
+- [x] Relacionamento entre posts e autor
+- [x] Tratamento global de exceções
+- [ ] Validação de entrada (Bean Validation)
+- [ ] Testes automatizados
+- [ ] Autenticação e autorização (Spring Security + JWT)
+- [ ] Documentação da API (Swagger/OpenAPI)
+- [ ] Paginação e ordenação nos endpoints de listagem
+- [ ] Deploy
 
 ## Executando o projeto
 
