@@ -48,6 +48,10 @@ public class Post implements Serializable {
         this.author = author;
     }
 
+    public Post(LocalDate date, String title, String body, User author) {
+        this(null, date, title, body, author);
+    }
+
     public String getId() {
         return id;
     }

@@ -19,13 +19,15 @@ public class User implements Serializable {
     private String id;
     private String name;
     private String email;
+    private String phone;
+    private String password;
     @DBRef
     private List<Post> posts = new ArrayList<>();
 
     public User() {
     }
 
-    public User(String id, String name, String email) {
+    public User(String id, String name, String email, String phone, String password) {
         this.id = id;
         if (name == null) {
             throw new IllegalArgumentException("Name cannot be null");
@@ -35,6 +37,14 @@ public class User implements Serializable {
             throw new IllegalArgumentException("Email cannot be null");
         }
         this.email = email;
+        if (phone == null){
+            throw new IllegalArgumentException("Phone cannot be null");
+        }
+        this.phone = phone;
+        if (password == null){
+            throw new IllegalArgumentException("Password cannot be null");
+        }
+        this.password = password;
     }
 
     public String getId() {
@@ -59,6 +69,22 @@ public class User implements Serializable {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public List<Post> getPosts() {
