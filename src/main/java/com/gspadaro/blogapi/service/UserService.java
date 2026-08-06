@@ -1,12 +1,12 @@
 package com.gspadaro.blogapi.service;
 
 
-import com.gspadaro.blogapi.domain.Post;
 import com.gspadaro.blogapi.domain.User;
-import com.gspadaro.blogapi.dto.*;
+import com.gspadaro.blogapi.dto.UserDetailsDTO;
+import com.gspadaro.blogapi.dto.UserRequestDTO;
+import com.gspadaro.blogapi.dto.UserResponseDTO;
 import com.gspadaro.blogapi.exception.ResourceNotFoundException;
 import com.gspadaro.blogapi.mapper.UserMapper;
-import com.gspadaro.blogapi.repository.PostRepository;
 import com.gspadaro.blogapi.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
@@ -40,6 +40,8 @@ public class UserService {
         User existingUser = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
         existingUser.setName(request.name());
         existingUser.setEmail(request.email());
+        existingUser.setPhone(request.phone());
+        existingUser.setPassword(request.password());
         User updatedUser = userRepository.save(existingUser);
         return UserMapper.toResponseDTO(updatedUser);
     }
