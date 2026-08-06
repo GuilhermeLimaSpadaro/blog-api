@@ -19,7 +19,7 @@ public class CommentMapper {
     }
 
     public static CommentResponseDTO toResponseDTO(Comment comment) {
-        return new CommentResponseDTO(comment.getId(), comment.getText(), comment.getDate(), UserMapper.toDetailsDTO(comment.getAuthor()));
+        return new CommentResponseDTO(comment.getId(), comment.getText(), comment.getDate(), UserMapper.toDetailsDTO(comment.getAuthor()), comment.getPost().getId());
     }
 
     public static List<CommentResponseDTO> toList(List<Comment> commentList) {
