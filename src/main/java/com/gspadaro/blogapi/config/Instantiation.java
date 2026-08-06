@@ -10,7 +10,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 
@@ -36,15 +36,15 @@ public class Instantiation implements CommandLineRunner {
 
         userRepo.saveAll(List.of(maria, alex, bob));
 
-        Post post00 = new Post(null, LocalDate.now(ZoneOffset.UTC), "Burguer king meu fast food favorito", "Adoro burguer king. Abraços!", alex);
-        Post post01 = new Post(null, LocalDate.of(2018, 3, 21), "Partiu viagem", "Vou viajar para São Paulo. Abraços!", maria);
-        Post post02 = new Post(null, LocalDate.of(2018, 3, 23), "Bom dia", "Acordei feliz hoje!", maria);
+        Post post00 = new Post(null, LocalDateTime.now(ZoneOffset.UTC), "Burguer king meu fast food favorito", "Adoro burguer king. Abraços!", alex);
+        Post post01 = new Post(null, LocalDateTime.of(2018, 3, 21, 13, 6, 0), "Partiu viagem", "Vou viajar para São Paulo. Abraços!", maria);
+        Post post02 = new Post(null, LocalDateTime.of(2018, 3, 23, 22, 30, 0), "Bom dia", "Acordei feliz hoje!", maria);
 
         postRepo.saveAll(List.of(post00, post01, post02));
 
-        Comment comment01 = new Comment("Boa viagem mano!", LocalDate.of(2018, 3, 21), alex);
-        Comment comment02 = new Comment("Aproveite!", LocalDate.of(2018, 3, 22), bob);
-        Comment comment03 = new Comment("Tenha um ótimo dia!", LocalDate.of(2018, 3, 23), alex);
+        Comment comment01 = new Comment("Boa viagem mano!", LocalDateTime.of(2018, 3, 21, 14, 7, 11), alex);
+        Comment comment02 = new Comment("Aproveite!", LocalDateTime.of(2018, 3, 22, 12, 44, 07), bob);
+        Comment comment03 = new Comment("Tenha um ótimo dia!", LocalDateTime.of(2018, 3, 23, 14, 07, 8), alex);
 
         post01.addComment(comment01);
         post01.addComment(comment02);

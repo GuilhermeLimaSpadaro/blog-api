@@ -2,20 +2,20 @@ package com.gspadaro.blogapi.domain;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class Comment implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
     private String text;
-    private LocalDate date;
+    private LocalDateTime date;
     private User author;
 
     public Comment() {
     }
 
-    public Comment(String text, LocalDate date, User author) {
+    public Comment(String text, LocalDateTime date, User author) {
         if (text == null) {
             throw new IllegalArgumentException("Text cannot be null");
         }
@@ -38,11 +38,11 @@ public class Comment implements Serializable {
         this.text = text;
     }
 
-    public LocalDate getDate() {
+    public LocalDateTime getDate() {
         return date;
     }
 
-    public void setDate(LocalDate date) {
+    public void setDate(LocalDateTime date) {
         this.date = date;
     }
 

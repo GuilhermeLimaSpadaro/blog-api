@@ -6,7 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -18,7 +18,7 @@ public class Post implements Serializable {
 
     @Id
     private String id;
-    private LocalDate date;
+    private LocalDateTime date;
     private String title;
     private String body;
     @DBRef
@@ -28,7 +28,7 @@ public class Post implements Serializable {
     public Post() {
     }
 
-    public Post(String id, LocalDate date, String title, String body, User author) {
+    public Post(String id, LocalDateTime date, String title, String body, User author) {
         this.id = id;
         if (date == null) {
             throw new IllegalArgumentException("Date cannot be null");
@@ -48,7 +48,7 @@ public class Post implements Serializable {
         this.author = author;
     }
 
-    public Post(LocalDate date, String title, String body, User author) {
+    public Post(LocalDateTime date, String title, String body, User author) {
         this(null, date, title, body, author);
     }
 
@@ -60,11 +60,11 @@ public class Post implements Serializable {
         this.id = id;
     }
 
-    public LocalDate getDate() {
+    public LocalDateTime getDate() {
         return date;
     }
 
-    public void setDate(LocalDate date) {
+    public void setDate(LocalDateTime date) {
         this.date = date;
     }
 

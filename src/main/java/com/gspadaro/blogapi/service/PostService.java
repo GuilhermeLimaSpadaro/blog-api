@@ -2,10 +2,8 @@ package com.gspadaro.blogapi.service;
 
 import com.gspadaro.blogapi.domain.Post;
 import com.gspadaro.blogapi.domain.User;
-import com.gspadaro.blogapi.dto.CommentResponseDTO;
 import com.gspadaro.blogapi.dto.PostRequestDTO;
 import com.gspadaro.blogapi.dto.PostResponseDTO;
-import com.gspadaro.blogapi.dto.UserResponseDTO;
 import com.gspadaro.blogapi.exception.ResourceNotFoundException;
 import com.gspadaro.blogapi.mapper.PostMapper;
 import com.gspadaro.blogapi.repository.PostRepository;
