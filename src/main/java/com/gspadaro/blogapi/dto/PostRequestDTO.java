@@ -2,5 +2,5 @@ package com.gspadaro.blogapi.dto;
 
 import java.time.LocalDateTime;
 
-public record PostRequestDTO(LocalDateTime date, String title, String body, String authorId) {
+public record PostRequestDTO(String title, String body, String authorId) {
 }
