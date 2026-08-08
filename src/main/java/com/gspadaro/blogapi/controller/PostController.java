@@ -45,13 +45,13 @@ public class PostController {
     }
 
     @GetMapping("users/{id}")
-    public ResponseEntity<List<PostResponseDTO>> findByUserId(@PathVariable String id) {
-        List<PostResponseDTO> posts = postService.findByUserId(id);
+    public ResponseEntity<List<PostResponseDTO>> findByAuthorId(@PathVariable String id) {
+        List<PostResponseDTO> posts = postService.findByAuthorId(id);
         return ResponseEntity.ok().body(posts);
     }
 
     @GetMapping("/comment/{id}")
-    public ResponseEntity<PostWithCommentsDTO> findAllPostsWithComments(@PathVariable String id) {
+    public ResponseEntity<PostWithCommentsDTO> listAllComments(@PathVariable String id) {
         return ResponseEntity.ok().body(postService.listAllComments(id));
     }
 }
