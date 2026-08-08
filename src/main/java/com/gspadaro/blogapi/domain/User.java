@@ -21,8 +21,6 @@ public class User implements Serializable {
     private String email;
     private String phone;
     private String password;
-    @DBRef
-    private List<Post> posts = new ArrayList<>();
 
     public User() {
     }
@@ -89,10 +87,6 @@ public class User implements Serializable {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public List<Post> getPosts() {
-        return posts;
     }
 
     @Override
