@@ -1,6 +1,5 @@
 package com.gspadaro.blogapi.controller;
 
-import com.gspadaro.blogapi.dto.PostResponseDTO;
 import com.gspadaro.blogapi.dto.UserDetailsDTO;
 import com.gspadaro.blogapi.dto.UserRequestDTO;
 import com.gspadaro.blogapi.dto.UserResponseDTO;
@@ -24,10 +23,9 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<UserDetailsDTO> create(@RequestBody UserRequestDTO userRequest) {
-        UserDetailsDTO userCreated = service.create(userRequest);
-        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
-                .buildAndExpand(userCreated.id()).toUri();
-        return ResponseEntity.created(uri).body(userCreated);
+        UserDetailsDTO user = service.create(userRequest);
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(user.id()).toUri();
+        return ResponseEntity.created(uri).body(user);
     }
 
     @DeleteMapping(value = "/{id}")

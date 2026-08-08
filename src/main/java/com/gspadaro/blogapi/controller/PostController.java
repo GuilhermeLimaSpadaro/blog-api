@@ -22,10 +22,9 @@ public class PostController {
 
     @PostMapping
     public ResponseEntity<PostResponseDTO> create(@RequestBody PostRequestDTO postRequest) {
-        PostResponseDTO postCreated = service.create(postRequest);
-        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
-                .buildAndExpand(postCreated.id()).toUri();
-        return ResponseEntity.created(uri).body(postCreated);
+        PostResponseDTO post = service.create(postRequest);
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(post.id()).toUri();
+        return ResponseEntity.created(uri).body(post);
     }
 
     @DeleteMapping(value = "/{id}")
@@ -51,7 +50,7 @@ public class PostController {
     }
 
     @GetMapping(value = "title/{title}")
-    public ResponseEntity<List<PostResponseDTO>> findPostByTitle(@PathVariable String title){
+    public ResponseEntity<List<PostResponseDTO>> findPostByTitle(@PathVariable String title) {
         return ResponseEntity.ok().body(service.findPostByTitle(title));
     }
 
