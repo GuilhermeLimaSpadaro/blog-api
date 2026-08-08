@@ -1,12 +1,15 @@
 package com.gspadaro.blogapi.service;
 
 import com.gspadaro.blogapi.domain.Comment;
+import com.gspadaro.blogapi.domain.Post;
 import com.gspadaro.blogapi.domain.User;
 import com.gspadaro.blogapi.dto.CommentRequestDTO;
 import com.gspadaro.blogapi.dto.CommentResponseDTO;
+import com.gspadaro.blogapi.dto.PostWithCommentsDTO;
 import com.gspadaro.blogapi.exception.ResourceNotFoundException;
 import com.gspadaro.blogapi.mapper.CommentMapper;
 import com.gspadaro.blogapi.repository.CommentRepository;
+import com.gspadaro.blogapi.repository.PostRepository;
 import com.gspadaro.blogapi.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
@@ -15,16 +18,19 @@ import java.util.List;
 @Service
 public class CommentService {
     private final CommentRepository commentRepository;
+    private final PostRepository postRepository;
     private final UserRepository userRepository;
 
-    public CommentService(CommentRepository commentRepository, UserRepository userRepository) {
+    public CommentService(CommentRepository commentRepository, PostRepository postRepository, UserRepository userRepository) {
         this.commentRepository = commentRepository;
+        this.postRepository = postRepository;
         this.userRepository = userRepository;
     }
 
     public CommentResponseDTO create(CommentRequestDTO request) {
         User user = userRepository.findById(request.authorId()).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
-        Comment comment = CommentMapper.toEntity(request, user);
+        Post post = postRepository.findById(request.postId()).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
+        Comment comment = CommentMapper.toEntity(request, user, post);
         Comment savedComment = commentRepository.save(comment);
         return CommentMapper.toResponseDTO(savedComment);
     }
