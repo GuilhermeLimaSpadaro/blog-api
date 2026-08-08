@@ -10,12 +10,10 @@ import com.gspadaro.blogapi.repository.PostRepository;
 import com.gspadaro.blogapi.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
 public class PostService {
-
     private final PostRepository postRepository;
     private final UserRepository userRepository;
 
@@ -25,13 +23,9 @@ public class PostService {
     }
 
     public PostResponseDTO create(PostRequestDTO request) {
-        Post newPost = new Post();
-        User author = userRepository.findById(request.authorId()).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
-        newPost.setDate(LocalDateTime.now());
-        newPost.setTitle(request.title());
-        newPost.setBody(request.body());
-        newPost.setAuthor(author);
-        Post savedPost = postRepository.save(newPost);
+        User user = userRepository.findById(request.authorId()).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
+        Post post = PostMapper.toEntity(request, user);
+        Post savedPost = postRepository.save(post);
         return PostMapper.toResponseDTO(savedPost);
     }
 
@@ -42,9 +36,7 @@ public class PostService {
 
     public PostResponseDTO update(String id, PostRequestDTO request) {
         Post post = postRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
-        post.setDate(LocalDateTime.now());
-        post.setTitle(request.title());
-        post.setBody(request.body());
+        PostMapper.updateEntity(post, request);
         Post updatedPost = postRepository.save(post);
         return PostMapper.toResponseDTO(updatedPost);
     }
@@ -54,11 +46,13 @@ public class PostService {
         return PostMapper.toResponseDTO(post);
     }
 
+    //Buscar post através do id do usuário.
     public List<PostResponseDTO> findPostsByUserId(String id) {
         List<Post> postList = postRepository.findByAuthorId(id);
         return postList.stream().map(PostMapper::toResponseDTO).toList();
     }
 
+    //Buscar post pelo título (ou palavra que pertença a ele).
     public List<PostResponseDTO> findPostByTitle(String title) {
         List<Post> postList = postRepository.findByTitleContainingIgnoreCase(title);
         return PostMapper.toList(postList);

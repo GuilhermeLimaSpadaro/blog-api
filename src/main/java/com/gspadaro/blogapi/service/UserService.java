@@ -14,7 +14,6 @@ import java.util.List;
 
 @Service
 public class UserService {
-
     private final UserRepository userRepository;
 
     public UserService(UserRepository userRepository) {
@@ -22,11 +21,7 @@ public class UserService {
     }
 
     public UserDetailsDTO create(UserRequestDTO request) {
-        User user = new User();
-        user.setName(request.name());
-        user.setEmail(request.email());
-        user.setPhone(request.phone());
-        user.setPassword(request.password());
+        User user = UserMapper.toEntity(request);
         User savedUser = userRepository.save(user);
         return UserMapper.toDetailsDTO(savedUser);
     }
@@ -37,12 +32,9 @@ public class UserService {
     }
 
     public UserResponseDTO update(String id, UserRequestDTO request) {
-        User existingUser = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
-        existingUser.setName(request.name());
-        existingUser.setEmail(request.email());
-        existingUser.setPhone(request.phone());
-        existingUser.setPassword(request.password());
-        User updatedUser = userRepository.save(existingUser);
+        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
+        UserMapper.updateEntity(user, request);
+        User updatedUser = userRepository.save(user);
         return UserMapper.toResponseDTO(updatedUser);
     }
 
@@ -52,7 +44,7 @@ public class UserService {
     }
 
     public List<UserResponseDTO> findAll() {
-        List<User> list = userRepository.findAll();
-        return list.stream().map(UserMapper::toResponseDTO).toList();
+        List<User> userList = userRepository.findAll();
+        return userList.stream().map(UserMapper::toResponseDTO).toList();
     }
 }

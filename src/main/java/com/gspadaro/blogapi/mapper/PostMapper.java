@@ -15,6 +15,11 @@ public class PostMapper {
         return new Post(request.title(), request.body(), user);
     }
 
+    public static void updateEntity(Post post, PostRequestDTO request) {
+        post.setTitle(request.title());
+        post.setBody(request.body());
+    }
+
     public static PostResponseDTO toResponseDTO(Post post) {
         return new PostResponseDTO(post.getId()
                 , post.getDate()
