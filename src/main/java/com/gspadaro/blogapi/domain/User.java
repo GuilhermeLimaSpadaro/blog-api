@@ -37,11 +37,11 @@ public class User implements Serializable {
             throw new IllegalArgumentException("Email cannot be null");
         }
         this.email = email;
-        if (phone == null){
+        if (phone == null) {
             throw new IllegalArgumentException("Phone cannot be null");
         }
         this.phone = phone;
-        if (password == null){
+        if (password == null) {
             throw new IllegalArgumentException("Password cannot be null");
         }
         this.password = password;
