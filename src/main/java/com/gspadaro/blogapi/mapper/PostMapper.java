@@ -1,5 +1,6 @@
 package com.gspadaro.blogapi.mapper;
 
+import com.gspadaro.blogapi.domain.Comment;
 import com.gspadaro.blogapi.domain.Post;
 import com.gspadaro.blogapi.domain.User;
 import com.gspadaro.blogapi.dto.CommentResponseDTO;
@@ -25,14 +26,10 @@ public class PostMapper {
                 , post.getDate()
                 , post.getTitle()
                 , post.getBody()
-                , new UserDetailsDTO(post.getAuthor().getId()
-                , post.getAuthor().getName())
-                , post.getComments().stream().map(comment ->
-                new CommentResponseDTO(comment.getId(), comment.getText()
-                        , comment.getDate()
-                        , new UserDetailsDTO(comment.getAuthor().getId()
-                        , comment.getAuthor().getName()))).toList());
+                , UserMapper.toDetailsDTO(post.getAuthor()));
     }
+
+
 
     public static List<PostResponseDTO> toList(List<Post> postList) {
         return postList.stream().map(PostMapper::toResponseDTO).toList();
