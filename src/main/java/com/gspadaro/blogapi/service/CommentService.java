@@ -1,0 +1,48 @@
+package com.gspadaro.blogapi.service;
+
+import com.gspadaro.blogapi.domain.Comment;
+import com.gspadaro.blogapi.domain.User;
+import com.gspadaro.blogapi.dto.CommentRequestDTO;
+import com.gspadaro.blogapi.dto.CommentResponseDTO;
+import com.gspadaro.blogapi.exception.ResourceNotFoundException;
+import com.gspadaro.blogapi.mapper.CommentMapper;
+import com.gspadaro.blogapi.repository.CommentRepository;
+import com.gspadaro.blogapi.repository.UserRepository;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+public class CommentService {
+    private final CommentRepository commentRepository;
+    private final UserRepository userRepository;
+
+    public CommentService(CommentRepository commentRepository, UserRepository userRepository) {
+        this.commentRepository = commentRepository;
+        this.userRepository = userRepository;
+    }
+
+    public CommentResponseDTO create(CommentRequestDTO request) {
+        User user = userRepository.findById(request.authorId()).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
+        Comment comment = CommentMapper.toEntity(request, user);
+        Comment savedComment = commentRepository.save(comment);
+        return CommentMapper.toResponseDTO(savedComment);
+    }
+
+    public CommentResponseDTO update(String id, CommentRequestDTO request) {
+        Comment comment = commentRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
+        CommentMapper.updateEntity(comment, request);
+        Comment updatedComment = commentRepository.save(comment);
+        return CommentMapper.toResponseDTO(updatedComment);
+    }
+
+    public void delete(String id) {
+        Comment comment = commentRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
+        commentRepository.delete(comment);
+    }
+
+    public List<CommentResponseDTO> findAll() {
+        List<Comment> commentList = commentRepository.findAll();
+        return CommentMapper.toList(commentList);
+    }
+}

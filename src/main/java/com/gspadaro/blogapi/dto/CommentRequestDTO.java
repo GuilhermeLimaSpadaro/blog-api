@@ -1,6 +1,4 @@
 package com.gspadaro.blogapi.dto;
 
-import java.time.LocalDateTime;
-
-public record CommentRequestDTO (String text, LocalDateTime date, String authorId){
+public record CommentRequestDTO(String text, String authorId) {
 }

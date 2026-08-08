@@ -23,13 +23,13 @@ public class PostMapper {
                 , new UserDetailsDTO(post.getAuthor().getId()
                 , post.getAuthor().getName())
                 , post.getComments().stream().map(comment ->
-                new CommentResponseDTO(comment.getText()
+                new CommentResponseDTO(comment.getId(), comment.getText()
                         , comment.getDate()
                         , new UserDetailsDTO(comment.getAuthor().getId()
                         , comment.getAuthor().getName()))).toList());
     }
 
-    public static List<PostResponseDTO> toList(List<Post> postList){
+    public static List<PostResponseDTO> toList(List<Post> postList) {
         return postList.stream().map(PostMapper::toResponseDTO).toList();
     }
 }
