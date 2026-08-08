@@ -47,21 +47,10 @@ public class Instantiation implements CommandLineRunner {
 
         postRepository.saveAll(List.of(post00, post01, post02));
 
-        Comment comment01 = new Comment("Boa viagem mano!", alex);
-        Comment comment02 = new Comment("Aproveite!", bob);
-        Comment comment03 = new Comment("Tenha um ótimo dia!", alex);
+        Comment comment01 = new Comment("Boa viagem mano!", alex, post00);
+        Comment comment02 = new Comment("Aproveite!", bob, post02);
+        Comment comment03 = new Comment("Tenha um ótimo dia!", alex, post01);
 
         commentRepository.saveAll(List.of(comment01, comment02, comment03));
-
-        post01.addComment(comment01);
-        post01.addComment(comment02);
-        post02.addComment(comment03);
-
-        postRepository.saveAll(List.of(post00, post01, post02));
-
-        alex.getPosts().add(post00);
-        maria.getPosts().addAll(List.of(post01, post02));
-
-        userRepo.saveAll(List.of(maria, alex));
     }
 }
