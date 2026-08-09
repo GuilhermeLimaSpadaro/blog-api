@@ -1,11 +1,15 @@
 package com.gspadaro.blogapi.service;
 
+import com.gspadaro.blogapi.domain.Comment;
 import com.gspadaro.blogapi.domain.Post;
 import com.gspadaro.blogapi.domain.User;
 import com.gspadaro.blogapi.dto.PostRequestDTO;
 import com.gspadaro.blogapi.dto.PostResponseDTO;
+import com.gspadaro.blogapi.dto.PostWithCommentsDTO;
 import com.gspadaro.blogapi.exception.ResourceNotFoundException;
+import com.gspadaro.blogapi.mapper.CommentMapper;
 import com.gspadaro.blogapi.mapper.PostMapper;
+import com.gspadaro.blogapi.repository.CommentRepository;
 import com.gspadaro.blogapi.repository.PostRepository;
 import com.gspadaro.blogapi.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -16,10 +20,12 @@ import java.util.List;
 public class PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final CommentRepository commentRepository;
 
-    public PostService(PostRepository postRepository, UserRepository userRepository) {
+    public PostService(PostRepository postRepository, UserRepository userRepository, CommentRepository commentRepository) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
+        this.commentRepository = commentRepository;
     }
 
     public PostResponseDTO create(PostRequestDTO request) {
@@ -46,20 +52,16 @@ public class PostService {
         return PostMapper.toResponseDTO(post);
     }
 
-    //Buscar post através do id do usuário.
-    public List<PostResponseDTO> findPostsByUserId(String id) {
+    //Buscar post através do id do Usuário.
+    public List<PostResponseDTO> findByUserId(String id) {
         List<Post> postList = postRepository.findByAuthorId(id);
         return postList.stream().map(PostMapper::toResponseDTO).toList();
     }
 
-    //Buscar post pelo título (ou palavra que pertença a ele).
-    public List<PostResponseDTO> findPostByTitle(String title) {
-        List<Post> postList = postRepository.findByTitleContainingIgnoreCase(title);
-        return PostMapper.toList(postList);
-    }
-
-    public List<PostResponseDTO> findAll() {
-        List<Post> postList = postRepository.findAll();
-        return PostMapper.toList(postList);
+    //Buscar Comentarios de um Post
+    public PostWithCommentsDTO listAllComments(String id) {
+        Post post = postRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
+        List<Comment> commentList = commentRepository.findByPostId(id);
+        return PostMapper.toPostWithCommentsDTO(PostMapper.toResponseDTO(post), CommentMapper.toList(commentList));
     }
 }
