@@ -3,6 +3,7 @@ package com.gspadaro.blogapi.config;
 import com.gspadaro.blogapi.domain.Comment;
 import com.gspadaro.blogapi.domain.Post;
 import com.gspadaro.blogapi.domain.User;
+import com.gspadaro.blogapi.repository.CommentRepository;
 import com.gspadaro.blogapi.repository.PostRepository;
 import com.gspadaro.blogapi.repository.UserRepository;
 import org.jspecify.annotations.NonNull;
@@ -10,51 +11,45 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
-import java.time.LocalDate;
-import java.time.ZoneOffset;
+import java.time.Instant;
 import java.util.List;
 
 @Configuration
 @Profile(value = "test")
 public class Instantiation implements CommandLineRunner {
-    private final UserRepository userRepo;
-    private final PostRepository postRepo;
+    private final UserRepository userRepository;
+    private final PostRepository postRepository;
+    private final CommentRepository commentRepository;
 
-    public Instantiation(UserRepository userRepo, PostRepository postRepo) {
-        this.userRepo = userRepo;
-        this.postRepo = postRepo;
+    public Instantiation(UserRepository userRepository, PostRepository postRepository, CommentRepository commentRepository) {
+        this.userRepository = userRepository;
+        this.postRepository = postRepository;
+        this.commentRepository = commentRepository;
     }
 
     @Override
+
     public void run(String @NonNull ... args) {
-        userRepo.deleteAll();
-        postRepo.deleteAll();
+        userRepository.deleteAll();
+        postRepository.deleteAll();
+        commentRepository.deleteAll();
 
-        User maria = new User(null, "Maria Brown", "maria@gmail.com");
-        User alex = new User(null, "Alex Green", "alex@gmail.com");
-        User bob = new User(null, "Bob Grey", "bob@gmail.com");
+        User maria = new User(null, "Maria Brown", "maria@gmail.com", "1111", "11111");
+        User alex = new User(null, "Alex Green", "alex@gmail.com", "22222", "33333");
+        User bob = new User(null, "Bob Grey", "bob@gmail.com", "22222", "11111");
 
-        userRepo.saveAll(List.of(maria, alex, bob));
+        userRepository.saveAll(List.of(maria, alex, bob));
 
-        Post post00 = new Post(null, LocalDate.now(ZoneOffset.UTC), "Burguer king meu fast food favorito", "Adoro burguer king. Abraços!", alex);
-        Post post01 = new Post(null, LocalDate.of(2018, 3, 21), "Partiu viagem", "Vou viajar para São Paulo. Abraços!", maria);
-        Post post02 = new Post(null, LocalDate.of(2018, 3, 23), "Bom dia", "Acordei feliz hoje!", maria);
+        Post post00 = new Post(null, Instant.now(), "Burguer king meu fast food favorito", "Adoro burguer king. Abraços!", alex);
+        Post post01 = new Post(null, Instant.now(), "Partiu viagem", "Vou viajar para São Paulo. Abraços!", maria);
+        Post post02 = new Post(null, Instant.now(), "Bom dia", "Acordei feliz hoje!", maria);
 
-        postRepo.saveAll(List.of(post00, post01, post02));
+        postRepository.saveAll(List.of(post00, post01, post02));
 
-        Comment comment01 = new Comment("Boa viagem mano!", LocalDate.of(2018, 3, 21), alex);
-        Comment comment02 = new Comment("Aproveite!", LocalDate.of(2018, 3, 22), bob);
-        Comment comment03 = new Comment("Tenha um ótimo dia!", LocalDate.of(2018, 3, 23), alex);
+        Comment comment01 = new Comment("Boa viagem mano!", alex, post00);
+        Comment comment02 = new Comment("Aproveite!", bob, post02);
+        Comment comment03 = new Comment("Tenha um ótimo dia!", alex, post01);
 
-        post01.addComment(comment01);
-        post01.addComment(comment02);
-        post02.addComment(comment03);
-
-        postRepo.saveAll(List.of(post00, post01, post02));
-
-        alex.getPosts().add(post00);
-        maria.getPosts().addAll(List.of(post01, post02));
-
-        userRepo.saveAll(List.of(maria, alex));
+        commentRepository.saveAll(List.of(comment01, comment02, comment03));
     }
 }
