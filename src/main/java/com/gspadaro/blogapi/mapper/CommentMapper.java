@@ -5,11 +5,10 @@ import com.gspadaro.blogapi.domain.Post;
 import com.gspadaro.blogapi.domain.User;
 import com.gspadaro.blogapi.dto.CommentRequestDTO;
 import com.gspadaro.blogapi.dto.CommentResponseDTO;
-import com.gspadaro.blogapi.dto.PostWithCommentsDTO;
 
 import java.util.List;
 
-public record CommentMapper() {
+public class CommentMapper {
 
     public static Comment toEntity(CommentRequestDTO request, User user, Post post) {
         return new Comment(request.text(), user, post);

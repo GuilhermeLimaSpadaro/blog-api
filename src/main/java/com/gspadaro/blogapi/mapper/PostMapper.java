@@ -18,13 +18,12 @@ public class PostMapper {
     }
 
     public static PostResponseDTO toResponseDTO(Post post) {
-        return new PostResponseDTO(post.getId()
-                , post.getDate()
-                , post.getTitle()
-                , post.getBody()
-                , UserMapper.toDetailsDTO(post.getAuthor()));
+        return new PostResponseDTO(post.getId(), post.getDate(), post.getTitle(), post.getBody(), UserMapper.toDetailsDTO(post.getAuthor()));
     }
 
+    public static PostWithCommentsDTO toPostWithCommentsDTO(PostResponseDTO post, List<CommentResponseDTO> commentList) {
+        return new PostWithCommentsDTO(post, commentList);
+    }
 
 
     public static List<PostResponseDTO> toList(List<Post> postList) {
