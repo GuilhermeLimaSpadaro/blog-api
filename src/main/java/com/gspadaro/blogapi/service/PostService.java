@@ -1,11 +1,15 @@
 package com.gspadaro.blogapi.service;
 
+import com.gspadaro.blogapi.domain.Comment;
 import com.gspadaro.blogapi.domain.Post;
 import com.gspadaro.blogapi.domain.User;
 import com.gspadaro.blogapi.dto.PostRequestDTO;
 import com.gspadaro.blogapi.dto.PostResponseDTO;
+import com.gspadaro.blogapi.dto.PostWithCommentsDTO;
 import com.gspadaro.blogapi.exception.ResourceNotFoundException;
+import com.gspadaro.blogapi.mapper.CommentMapper;
 import com.gspadaro.blogapi.mapper.PostMapper;
+import com.gspadaro.blogapi.repository.CommentRepository;
 import com.gspadaro.blogapi.repository.PostRepository;
 import com.gspadaro.blogapi.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -16,10 +20,12 @@ import java.util.List;
 public class PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final CommentRepository commentRepository;
 
-    public PostService(PostRepository postRepository, UserRepository userRepository) {
+    public PostService(PostRepository postRepository, UserRepository userRepository, CommentRepository commentRepository) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
+        this.commentRepository = commentRepository;
     }
 
     public PostResponseDTO create(PostRequestDTO request) {

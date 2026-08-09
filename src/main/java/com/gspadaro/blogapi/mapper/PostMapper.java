@@ -1,12 +1,8 @@
 package com.gspadaro.blogapi.mapper;
 
-import com.gspadaro.blogapi.domain.Comment;
 import com.gspadaro.blogapi.domain.Post;
 import com.gspadaro.blogapi.domain.User;
-import com.gspadaro.blogapi.dto.CommentResponseDTO;
-import com.gspadaro.blogapi.dto.PostRequestDTO;
-import com.gspadaro.blogapi.dto.PostResponseDTO;
-import com.gspadaro.blogapi.dto.UserDetailsDTO;
+import com.gspadaro.blogapi.dto.*;
 
 import java.util.List;
 
