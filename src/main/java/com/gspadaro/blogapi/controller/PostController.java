@@ -50,13 +50,8 @@ public class PostController {
         return ResponseEntity.ok().body(posts);
     }
 
-    @GetMapping(value = "title/{title}")
-    public ResponseEntity<List<PostResponseDTO>> findPostByTitle(@PathVariable String title) {
-        return ResponseEntity.ok().body(service.findPostByTitle(title));
-    }
-
-    @GetMapping
-    public ResponseEntity<List<PostResponseDTO>> findAll() {
-        return ResponseEntity.ok().body(service.findAll());
+    @GetMapping("/comment/{id}")
+    public ResponseEntity<PostWithCommentsDTO> findAllPostsWithComments(@PathVariable String id) {
+        return ResponseEntity.ok().body(postService.listAllComments(id));
     }
 }

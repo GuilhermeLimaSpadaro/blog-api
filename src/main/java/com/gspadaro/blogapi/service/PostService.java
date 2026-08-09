@@ -52,20 +52,16 @@ public class PostService {
         return PostMapper.toResponseDTO(post);
     }
 
-    //Buscar post através do id do usuário.
-    public List<PostResponseDTO> findPostsByUserId(String id) {
+    //Buscar post através do id do Usuário.
+    public List<PostResponseDTO> findByUserId(String id) {
         List<Post> postList = postRepository.findByAuthorId(id);
         return postList.stream().map(PostMapper::toResponseDTO).toList();
     }
 
-    //Buscar post pelo título (ou palavra que pertença a ele).
-    public List<PostResponseDTO> findPostByTitle(String title) {
-        List<Post> postList = postRepository.findByTitleContainingIgnoreCase(title);
-        return PostMapper.toList(postList);
-    }
-
-    public List<PostResponseDTO> findAll() {
-        List<Post> postList = postRepository.findAll();
-        return PostMapper.toList(postList);
+    //Buscar Comentarios de um Post
+    public PostWithCommentsDTO listAllComments(String id) {
+        Post post = postRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
+        List<Comment> commentList = commentRepository.findByPostId(id);
+        return PostMapper.toPostWithCommentsDTO(PostMapper.toResponseDTO(post), CommentMapper.toList(commentList));
     }
 }
