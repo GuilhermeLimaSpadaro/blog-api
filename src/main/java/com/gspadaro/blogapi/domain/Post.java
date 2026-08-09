@@ -24,7 +24,7 @@ public class Post implements Serializable {
     private String body;
     @DBRef
     private User author;
-    private List<Comment> comments = new ArrayList<>();
+
 
     public Post() {
     }
@@ -35,7 +35,7 @@ public class Post implements Serializable {
             throw new IllegalArgumentException("Date cannot be null");
         }
         this.date = date;
-        if (title == null ) {
+        if (title == null) {
             throw new IllegalArgumentException("Title cannot be null");
         }
         this.title = title;
@@ -91,14 +91,6 @@ public class Post implements Serializable {
 
     public void setAuthor(User author) {
         this.author = author;
-    }
-
-    public List<Comment> getComments() {
-        return comments;
-    }
-
-    public void addComment(Comment comment) {
-        comments.add(comment);
     }
 
     @Override

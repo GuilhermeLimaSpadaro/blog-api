@@ -21,11 +21,13 @@ public class Comment implements Serializable {
     private Instant date = Instant.now();
     @DBRef
     private User author;
+    @DBRef
+    private Post post;
 
     public Comment() {
     }
 
-    public Comment(String text, User author) {
+    public Comment(String text, User author, Post post) {
         if (text == null) {
             throw new IllegalArgumentException("Text cannot be null");
         }
@@ -34,6 +36,10 @@ public class Comment implements Serializable {
             throw new IllegalArgumentException("Author cannot be null");
         }
         this.author = author;
+        if(post ==  null){
+            throw new IllegalArgumentException("Post cannot be null");
+        }
+        this.post = post;
     }
 
     public String getId() {
@@ -66,6 +72,14 @@ public class Comment implements Serializable {
 
     public void setAuthor(User author) {
         this.author = author;
+    }
+
+    public Post getPost() {
+        return post;
+    }
+
+    public void setPost(Post post) {
+        this.post = post;
     }
 
     @Override
