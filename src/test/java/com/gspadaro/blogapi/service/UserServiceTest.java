@@ -2,7 +2,6 @@ package com.gspadaro.blogapi.service;
 
 import com.gspadaro.blogapi.domain.User;
 import com.gspadaro.blogapi.dto.UserRequestDTO;
-import com.gspadaro.blogapi.repository.PostRepository;
 import com.gspadaro.blogapi.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -26,9 +25,6 @@ class UserServiceTest {
 
     @Mock
     private UserRepository userRepository;
-
-    @Mock
-    private PostRepository postRepository;
 
     @InjectMocks
     private UserService userService;
@@ -84,13 +80,13 @@ class UserServiceTest {
         //Act
         var result = userService.update(saved.getId(), input);
         //Assert
-        verify(userRepository).save(saved);
+        var userCapture = userCaptor.getValue();
+        verify(userRepository).save(userCapture);
         assertNotNull(result);
         assertEquals(saved.getId(), result.id());
         assertEquals(saved.getName(), result.name());
         assertEquals(saved.getEmail(), result.email());
         assertEquals(saved.getPhone(), result.phone());
-        var userCapture = userCaptor.getValue();
         assertEquals(input.name(), userCapture.getName());
         assertEquals(input.email(), userCapture.getEmail());
         assertEquals(input.phone(), userCapture.getPhone());
