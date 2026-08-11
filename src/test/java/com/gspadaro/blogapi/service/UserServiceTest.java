@@ -34,47 +34,60 @@ class UserServiceTest {
     private UserService userService;
 
     @Captor
-    private ArgumentCaptor<User> userArgumentCaptor;
+    private ArgumentCaptor<User> userCaptor;
 
     private User saved;
-    private UserRequestDTO userInput;
+    private UserRequestDTO input;
 
     @BeforeEach
     void setUp() {
         saved = new User(UUID.randomUUID().toString(), "Guilherme", "guilhermespadaro@gmail.com", "11955447766", "13ABC234");
-        userInput = new UserRequestDTO("Guilherme", "guilhermespadaro@gmail.com", "1177886655", "22@@ABC66");
+        input = new UserRequestDTO("Guilherme", "guilhermespadaro@gmail.com", "1177886655", "22@@ABC66");
     }
 
     @Test
     @DisplayName("Should create a user successfully.")
-    void shouldCreateAUserSuccessfully() {
+    void shouldCreateUser() {
         //Arrange
-        doReturn(saved).when(userRepository).save(userArgumentCaptor.capture());
+        doReturn(saved).when(userRepository).save(userCaptor.capture());
         //Act
-        var output = userService.create(userInput);
+        var result = userService.create(input);
         //Assert
-        verify(userRepository).save(saved);
-        assertNotNull(output);
-        assertEquals(saved.getId(), output.id());
-        assertEquals(saved.getName(), output.name());
-        var userCaptured = userArgumentCaptor.getValue();
-        assertEquals(userInput.name(), userCaptured.getName());
-        assertEquals(userInput.email(), userCaptured.getEmail());
-        assertEquals(userInput.phone(), userCaptured.getPhone());
+        var userCaptured = userCaptor.getValue();
+        verify(userRepository).save(userCaptured);
+        assertNotNull(result);
+        assertEquals(saved.getId(), result.id());
+        assertEquals(saved.getName(), result.name());
+        assertEquals(input.name(), userCaptured.getName());
+        assertEquals(input.email(), userCaptured.getEmail());
+        assertEquals(input.phone(), userCaptured.getPhone());
     }
 
     @Test
-    @DisplayName("User deletion must have been successful")
-    void userDeletionMustHaveBeenSuccessful() {
+    @DisplayName("User deletion must have been successful.")
+    void shouldDeleteUser() {
         //Arrange
         doReturn(Optional.of(saved)).when(userRepository).findById(saved.getId());
-        doNothing().when(userRepository).delete(userArgumentCaptor.capture());
+        doNothing().when(userRepository).delete(userCaptor.capture());
         //Act
         userService.delete(saved.getId());
         //Assert
         verify(userRepository).delete(saved);
     }
 
-    
-
+    @Test
+    @DisplayName("User find by id must have been successful.")
+    void shouldFindUserById(){
+        //Arrange
+        doReturn(Optional.of(saved)).when(userRepository).findById(saved.getId());
+        //Act
+        var result = userService.findById(saved.getId());
+        //Assert
+        verify(userRepository).findById(saved.getId());
+        assertNotNull(result);
+        assertEquals(saved.getId(), result.id());
+        assertEquals(saved.getName(), result.name());
+        assertEquals(saved.getEmail(), result.email());
+        assertEquals(saved.getPhone(), result.phone());
+    }
 }
