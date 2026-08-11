@@ -53,18 +53,18 @@ class UserServiceTest {
         //Act
         var result = userService.create(input);
         //Assert
-        var userCaptured = userCaptor.getValue();
-        verify(userRepository).save(userCaptured);
+        var userCapture = userCaptor.getValue();
+        verify(userRepository).save(userCapture);
         assertNotNull(result);
         assertEquals(saved.getId(), result.id());
         assertEquals(saved.getName(), result.name());
-        assertEquals(input.name(), userCaptured.getName());
-        assertEquals(input.email(), userCaptured.getEmail());
-        assertEquals(input.phone(), userCaptured.getPhone());
+        assertEquals(input.name(), userCapture.getName());
+        assertEquals(input.email(), userCapture.getEmail());
+        assertEquals(input.phone(), userCapture.getPhone());
     }
 
     @Test
-    @DisplayName("User deletion must have been successful.")
+    @DisplayName("Should delete user successfully")
     void shouldDeleteUser() {
         //Arrange
         doReturn(Optional.of(saved)).when(userRepository).findById(saved.getId());
@@ -76,8 +76,29 @@ class UserServiceTest {
     }
 
     @Test
-    @DisplayName("User find by id must have been successful.")
-    void shouldFindUserById(){
+    @DisplayName("Should update user")
+    void shouldUpdateUser() {
+        //Arrange
+        doReturn(Optional.of(saved)).when(userRepository).findById(saved.getId());
+        doReturn(saved).when(userRepository).save(userCaptor.capture());
+        //Act
+        var result = userService.update(saved.getId(), input);
+        //Assert
+        verify(userRepository).save(saved);
+        assertNotNull(result);
+        assertEquals(saved.getId(), result.id());
+        assertEquals(saved.getName(), result.name());
+        assertEquals(saved.getEmail(), result.email());
+        assertEquals(saved.getPhone(), result.phone());
+        var userCapture = userCaptor.getValue();
+        assertEquals(input.name(), userCapture.getName());
+        assertEquals(input.email(), userCapture.getEmail());
+        assertEquals(input.phone(), userCapture.getPhone());
+    }
+
+    @Test
+    @DisplayName("Should find user by id successfully")
+    void shouldFindUserById() {
         //Arrange
         doReturn(Optional.of(saved)).when(userRepository).findById(saved.getId());
         //Act
