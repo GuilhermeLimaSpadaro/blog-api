@@ -22,8 +22,7 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class PostServiceTest {
@@ -58,11 +57,11 @@ class PostServiceTest {
         var result = postService.create(input);
         //Assert
         verify(postRepository).save(captor.capture());
-        var postCapture = captor.getValue();
-        assertNotNull(result);
-        assertEquals(input.authorId(), postCapture.getAuthor().getId());
-        assertEquals(input.title(), postCapture.getTitle());
-        assertEquals(input.body(), postCapture.getBody());
+        var postCaptor = captor.getValue();
+        assertNotNull(postCaptor);
+        assertEquals(input.authorId(), postCaptor.getAuthor().getId());
+        assertEquals(input.title(), postCaptor.getTitle());
+        assertEquals(input.body(), postCaptor.getBody());
         assertEquals(saved.getId(), result.id());
         assertEquals(saved.getDate(), result.date());
         assertEquals(saved.getTitle(), result.title());
@@ -74,27 +73,42 @@ class PostServiceTest {
     @DisplayName("Should delete post successfully")
     void shouldDeletePost() {
         //Arrange
-
+        doReturn(saved).when(postRepository).findById(saved.getId());
+        doNothing().when(postRepository).delete(saved);
         //Act
-
+        postService.delete(saved.getId());
         //Assert
+        verify(postRepository).delete(saved);
     }
 
     @Test
     @DisplayName("Should update post")
     void shouldUpdatePost() {
         //Arrange
-
+        doReturn(saved).when(postRepository).findById(saved.getId());
+        doReturn(saved).when(postRepository).save(any(Post.class));
         //Act
-
+        var result = postService.update(saved.getId(), input);
         //Assert
+        verify(postRepository).findById(saved.getId());
+        verify(postRepository).save(captor.capture());
+        var postCaptor = captor.getValue();
+        assertNotNull(postCaptor);
+        assertEquals(saved.getId(), result.id());
+        assertEquals(saved.getDate(), result.date());
+        assertEquals(saved.getTitle(), result.title());
+        assertEquals(saved.getBody(), result.body());
+        assertEquals(saved.getAuthor().getId(), result.author().id());
+        assertEquals(input.title(), postCaptor.getTitle());
+        assertEquals(input.body(), postCaptor.getBody());
+        assertEquals(input.authorId(), postCaptor.getAuthor().getId());
     }
 
     @Test
     @DisplayName("Should find post by id successfully")
     void shouldFindPostById() {
         //Arrange
-
+        
         //Act
 
         //Assert
