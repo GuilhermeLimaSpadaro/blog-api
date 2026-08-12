@@ -30,7 +30,7 @@ class UserServiceTest {
     private UserService userService;
 
     @Captor
-    private ArgumentCaptor<User> userCaptor;
+    private ArgumentCaptor<User> captor;
 
     private User saved;
     private UserRequestDTO input;
@@ -45,18 +45,18 @@ class UserServiceTest {
     @DisplayName("Should create a user successfully.")
     void shouldCreateUser() {
         //Arrange
-        doReturn(saved).when(userRepository).save(userCaptor.capture());
+        doReturn(saved).when(userRepository).save(any(User.class));
         //Act
         var result = userService.create(input);
         //Assert
-        var userCapture = userCaptor.getValue();
-        verify(userRepository).save(userCapture);
+        verify(userRepository).save(captor.capture());
+        var userCaptured = captor.getValue();
         assertNotNull(result);
         assertEquals(saved.getId(), result.id());
         assertEquals(saved.getName(), result.name());
-        assertEquals(input.name(), userCapture.getName());
-        assertEquals(input.email(), userCapture.getEmail());
-        assertEquals(input.phone(), userCapture.getPhone());
+        assertEquals(input.name(), userCaptured.getName());
+        assertEquals(input.email(), userCaptured.getEmail());
+        assertEquals(input.phone(), userCaptured.getPhone());
     }
 
     @Test
@@ -64,7 +64,7 @@ class UserServiceTest {
     void shouldDeleteUser() {
         //Arrange
         doReturn(Optional.of(saved)).when(userRepository).findById(saved.getId());
-        doNothing().when(userRepository).delete(userCaptor.capture());
+        doNothing().when(userRepository).delete(saved);
         //Act
         userService.delete(saved.getId());
         //Assert
@@ -76,20 +76,20 @@ class UserServiceTest {
     void shouldUpdateUser() {
         //Arrange
         doReturn(Optional.of(saved)).when(userRepository).findById(saved.getId());
-        doReturn(saved).when(userRepository).save(userCaptor.capture());
+        doReturn(saved).when(userRepository).save(any(User.class));
         //Act
         var result = userService.update(saved.getId(), input);
         //Assert
-        var userCapture = userCaptor.getValue();
-        verify(userRepository).save(userCapture);
+        verify(userRepository).save(captor.capture());
+        var userCaptured = captor.getValue();
         assertNotNull(result);
         assertEquals(saved.getId(), result.id());
         assertEquals(saved.getName(), result.name());
         assertEquals(saved.getEmail(), result.email());
         assertEquals(saved.getPhone(), result.phone());
-        assertEquals(input.name(), userCapture.getName());
-        assertEquals(input.email(), userCapture.getEmail());
-        assertEquals(input.phone(), userCapture.getPhone());
+        assertEquals(input.name(), userCaptured.getName());
+        assertEquals(input.email(), userCaptured.getEmail());
+        assertEquals(input.phone(), userCaptured.getPhone());
     }
 
     @Test
@@ -107,6 +107,4 @@ class UserServiceTest {
         assertEquals(saved.getEmail(), result.email());
         assertEquals(saved.getPhone(), result.phone());
     }
-
-
 }
