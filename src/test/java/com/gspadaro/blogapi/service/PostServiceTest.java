@@ -72,7 +72,7 @@ class PostServiceTest {
 
     @Test
     @DisplayName("Should delete post successfully")
-    void shouldDeleteUser() {
+    void shouldDeletePost() {
         //Arrange
 
         //Act
@@ -82,7 +82,7 @@ class PostServiceTest {
 
     @Test
     @DisplayName("Should update post")
-    void shouldUpdateUser() {
+    void shouldUpdatePost() {
         //Arrange
 
         //Act
@@ -92,7 +92,7 @@ class PostServiceTest {
 
     @Test
     @DisplayName("Should find post by id successfully")
-    void shouldFindUserById() {
+    void shouldFindPostById() {
         //Arrange
 
         //Act
