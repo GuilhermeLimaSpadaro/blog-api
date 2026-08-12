@@ -108,10 +108,15 @@ class PostServiceTest {
     @DisplayName("Should find post by id successfully")
     void shouldFindPostById() {
         //Arrange
-        
+        doReturn(saved).when(postRepository).findById(saved.getId());
         //Act
-
+        var result = postService.findById(saved.getId());
         //Assert
-
+        verify(postRepository).findById(saved.getId());
+        assertEquals(saved.getId(), result.id());
+        assertEquals(saved.getDate(), result.date());
+        assertEquals(saved.getTitle(), result.title());
+        assertEquals(saved.getBody(), result.body());
+        assertEquals(saved.getAuthor().getId(), result.author().id());
     }
 }
