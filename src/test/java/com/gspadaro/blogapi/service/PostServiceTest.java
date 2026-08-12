@@ -73,7 +73,7 @@ class PostServiceTest {
     @DisplayName("Should delete post successfully")
     void shouldDeletePost() {
         //Arrange
-        doReturn(saved).when(postRepository).findById(saved.getId());
+        doReturn(Optional.of(saved)).when(postRepository).findById(saved.getId());
         doNothing().when(postRepository).delete(saved);
         //Act
         postService.delete(saved.getId());
@@ -85,7 +85,7 @@ class PostServiceTest {
     @DisplayName("Should update post")
     void shouldUpdatePost() {
         //Arrange
-        doReturn(saved).when(postRepository).findById(saved.getId());
+        doReturn(Optional.of(saved)).when(postRepository).findById(saved.getId());
         doReturn(saved).when(postRepository).save(any(Post.class));
         //Act
         var result = postService.update(saved.getId(), input);
@@ -108,7 +108,7 @@ class PostServiceTest {
     @DisplayName("Should find post by id successfully")
     void shouldFindPostById() {
         //Arrange
-        doReturn(saved).when(postRepository).findById(saved.getId());
+        doReturn(Optional.of(saved)).when(postRepository).findById(saved.getId());
         //Act
         var result = postService.findById(saved.getId());
         //Assert
