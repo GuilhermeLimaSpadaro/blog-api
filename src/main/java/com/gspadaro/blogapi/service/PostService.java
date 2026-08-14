@@ -53,7 +53,7 @@ public class PostService {
     }
 
     //Buscar post através do id do Usuário.
-    public List<PostResponseDTO> findByUserId(String id) {
+    public List<PostResponseDTO> findByAuthorId(String id) {
         List<Post> postList = postRepository.findByAuthorId(id);
         return postList.stream().map(PostMapper::toResponseDTO).toList();
     }
