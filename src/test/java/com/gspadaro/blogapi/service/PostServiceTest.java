@@ -1,8 +1,11 @@
 package com.gspadaro.blogapi.service;
 
+import com.gspadaro.blogapi.domain.Comment;
 import com.gspadaro.blogapi.domain.Post;
 import com.gspadaro.blogapi.domain.User;
 import com.gspadaro.blogapi.dto.PostRequestDTO;
+import com.gspadaro.blogapi.dto.PostResponseDTO;
+import com.gspadaro.blogapi.repository.CommentRepository;
 import com.gspadaro.blogapi.repository.PostRepository;
 import com.gspadaro.blogapi.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,11 +19,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -31,92 +34,149 @@ class PostServiceTest {
     private PostRepository postRepository;
     @Mock
     private UserRepository userRepository;
+    @Mock
+    private CommentRepository commentRepository;
     @InjectMocks
     private PostService postService;
     @Captor
     private ArgumentCaptor<Post> captor;
 
-    private User user;
-    private Post saved;
-    private PostRequestDTO input;
+    private User savedUser;
+    private Post savedPost;
+    private PostRequestDTO requestPost;
+    private List<Post> postResponseList;
+    private List<Comment> commentList;
 
     @BeforeEach
     void setUp() {
-        user = new User(UUID.randomUUID().toString(), "Guilherme", "guilhermespadaro@gmail.com", "11955447766", "13ABC234");
-        saved = new Post(UUID.randomUUID().toString(), Instant.now(), "Bom dia!", "Como o dia está lindo hoje!", user);
-        input = new PostRequestDTO("Bom dia!", "Como o dia está lindo hoje!", user.getId());
+        savedUser = new User(UUID.randomUUID().toString(), "Guilherme", "guilhermespadaro@gmail.com", "11955447766", "13ABC234");
+        savedPost = new Post(UUID.randomUUID().toString(), Instant.now(), "Bom dia!", "Como o dia está lindo hoje!", savedUser);
+        Post savedPost01 = new Post(UUID.randomUUID().toString(), Instant.now(), "Partiu viagem", "Vou viajar para São Paulo. Abraços!", savedUser);
+        Post savedPost02 = new Post(UUID.randomUUID().toString(), Instant.now(), "Bom dia", "Acordei feliz hoje!", savedUser);
+        requestPost = new PostRequestDTO("Bom dia!", "Como o dia está lindo hoje!", savedUser.getId());
+        Comment savedComment = new Comment(UUID.randomUUID().toString(), "Muito bom, adorei o post!", savedUser, savedPost);
+        Comment savedComment01 = new Comment(UUID.randomUUID().toString(), "Boa viagem mano!", savedUser, savedPost);
+        Comment savedComment02 = new Comment(UUID.randomUUID().toString(), "Aproveite!", savedUser, savedPost);
+
+        postResponseList = List.of(savedPost, savedPost01, savedPost02);
+        commentList = List.of(savedComment, savedComment01, savedComment02);
     }
 
     @Test
     @DisplayName("Should create a post successfully.")
     void shouldCreatePost() {
         //Arrange
-        doReturn(Optional.of(user)).when(userRepository).findById(input.authorId());
-        doReturn(saved).when(postRepository).save(any(Post.class));
+        doReturn(Optional.of(savedUser)).when(userRepository).findById(requestPost.authorId());
+        doReturn(savedPost).when(postRepository).save(any(Post.class));
         //Act
-        var result = postService.create(input);
+        var result = postService.create(requestPost);
         //Assert
         verify(postRepository).save(captor.capture());
         var postCaptor = captor.getValue();
         assertNotNull(postCaptor);
-        assertEquals(input.authorId(), postCaptor.getAuthor().getId());
-        assertEquals(input.title(), postCaptor.getTitle());
-        assertEquals(input.body(), postCaptor.getBody());
-        assertEquals(saved.getId(), result.id());
-        assertEquals(saved.getDate(), result.date());
-        assertEquals(saved.getTitle(), result.title());
-        assertEquals(saved.getBody(), result.body());
-        assertEquals(saved.getAuthor().getId(), result.author().id());
+        assertEquals(requestPost.authorId(), postCaptor.getAuthor().getId());
+        assertEquals(requestPost.title(), postCaptor.getTitle());
+        assertEquals(requestPost.body(), postCaptor.getBody());
+        assertEquals(savedPost.getId(), result.id());
+        assertEquals(savedPost.getDate(), result.date());
+        assertEquals(savedPost.getTitle(), result.title());
+        assertEquals(savedPost.getBody(), result.body());
+        assertEquals(savedPost.getAuthor().getId(), result.author().id());
     }
 
     @Test
     @DisplayName("Should delete post successfully")
     void shouldDeletePost() {
         //Arrange
-        doReturn(Optional.of(saved)).when(postRepository).findById(saved.getId());
-        doNothing().when(postRepository).delete(saved);
+        doReturn(Optional.of(savedPost)).when(postRepository).findById(savedPost.getId());
+        doNothing().when(postRepository).delete(savedPost);
         //Act
-        postService.delete(saved.getId());
+        postService.delete(savedPost.getId());
         //Assert
-        verify(postRepository).delete(saved);
+        verify(postRepository).delete(savedPost);
     }
 
     @Test
     @DisplayName("Should update post")
     void shouldUpdatePost() {
         //Arrange
-        doReturn(Optional.of(saved)).when(postRepository).findById(saved.getId());
-        doReturn(saved).when(postRepository).save(any(Post.class));
+        doReturn(Optional.of(savedPost)).when(postRepository).findById(savedPost.getId());
+        doReturn(savedPost).when(postRepository).save(any(Post.class));
         //Act
-        var result = postService.update(saved.getId(), input);
+        var result = postService.update(savedPost.getId(), requestPost);
         //Assert
-        verify(postRepository).findById(saved.getId());
+        verify(postRepository).findById(savedPost.getId());
         verify(postRepository).save(captor.capture());
         var postCaptor = captor.getValue();
         assertNotNull(postCaptor);
-        assertEquals(saved.getId(), result.id());
-        assertEquals(saved.getDate(), result.date());
-        assertEquals(saved.getTitle(), result.title());
-        assertEquals(saved.getBody(), result.body());
-        assertEquals(saved.getAuthor().getId(), result.author().id());
-        assertEquals(input.title(), postCaptor.getTitle());
-        assertEquals(input.body(), postCaptor.getBody());
-        assertEquals(input.authorId(), postCaptor.getAuthor().getId());
+        assertEquals(savedPost.getId(), result.id());
+        assertEquals(savedPost.getDate(), result.date());
+        assertEquals(savedPost.getTitle(), result.title());
+        assertEquals(savedPost.getBody(), result.body());
+        assertEquals(savedPost.getAuthor().getId(), result.author().id());
+        assertEquals(requestPost.title(), postCaptor.getTitle());
+        assertEquals(requestPost.body(), postCaptor.getBody());
+        assertEquals(requestPost.authorId(), postCaptor.getAuthor().getId());
     }
 
     @Test
     @DisplayName("Should find post by id successfully")
     void shouldFindPostById() {
         //Arrange
-        doReturn(Optional.of(saved)).when(postRepository).findById(saved.getId());
+        doReturn(Optional.of(savedPost)).when(postRepository).findById(savedPost.getId());
         //Act
-        var result = postService.findById(saved.getId());
+        var result = postService.findById(savedPost.getId());
         //Assert
-        verify(postRepository).findById(saved.getId());
-        assertEquals(saved.getId(), result.id());
-        assertEquals(saved.getDate(), result.date());
-        assertEquals(saved.getTitle(), result.title());
-        assertEquals(saved.getBody(), result.body());
-        assertEquals(saved.getAuthor().getId(), result.author().id());
+        verify(postRepository).findById(savedPost.getId());
+        assertEquals(savedPost.getId(), result.id());
+        assertEquals(savedPost.getDate(), result.date());
+        assertEquals(savedPost.getTitle(), result.title());
+        assertEquals(savedPost.getBody(), result.body());
+        assertEquals(savedPost.getAuthor().getId(), result.author().id());
+    }
+
+    @Test
+    @DisplayName("Should find post by user id")
+    void shouldFindPostByUserId() {
+        //Arrange
+        doReturn(postResponseList).when(postRepository).findByAuthorId(savedUser.getId());
+        //Act
+        var result = postService.findByAuthorId(savedUser.getId());
+        //Assert
+        verify(postRepository).findByAuthorId(savedUser.getId());
+        assertNotNull(result);
+        Optional<Post> postFound = postResponseList.stream().filter(post -> savedUser.getId().equals(post.getAuthor().getId())).findFirst();
+        Optional<PostResponseDTO> returnPost = result.stream().filter(post -> savedUser.getId().equals(post.author().id())).findFirst();
+        assertTrue(postFound.isPresent());
+        assertTrue(returnPost.isPresent());
+        assertEquals(postFound.get().getId(), returnPost.get().id());
+    }
+
+    @Test
+    @DisplayName("Should find post with comments")
+    void shouldListPostWithComment() {
+        //Arrange
+        doReturn(Optional.of(savedPost)).when(postRepository).findById(savedPost.getId());
+        doReturn(commentList).when(commentRepository).findByPostId(savedPost.getId());
+        //Act
+        var result = postService.listAllComments(savedPost.getId());
+        //Assert
+        verify(postRepository).findById(savedPost.getId());
+        verify(commentRepository).findByPostId(savedPost.getId());
+        assertNotNull(result);
+        assertEquals(savedPost.getId(), result.post().id());
+        assertEquals(savedPost.getDate(), result.post().date());
+        assertEquals(savedPost.getTitle(), result.post().title());
+        assertEquals(savedPost.getBody(), result.post().body());
+        assertEquals(savedPost.getAuthor().getId(), result.post().author().id());
+        var commentsFound = commentList.stream().filter(comment -> savedPost.getId().equals(comment.getPost().getId())).findFirst();
+        var returnComments = result.comment().stream().filter(commentResponseDTO -> savedPost.getId().equals(commentResponseDTO.postId())).findFirst();
+        assertTrue(commentsFound.isPresent());
+        assertTrue(returnComments.isPresent());
+        assertEquals(commentsFound.get().getId(), returnComments.get().id());
+        assertEquals(commentsFound.get().getText(), returnComments.get().text());
+        assertEquals(commentsFound.get().getDate(), returnComments.get().date());
+        assertEquals(commentsFound.get().getAuthor().getId(), returnComments.get().author().id());
+        assertEquals(commentsFound.get().getPost().getAuthor().getId(), returnComments.get().author().id());
     }
 }
