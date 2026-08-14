@@ -16,7 +16,7 @@ public class Post implements Serializable {
 
     @Id
     private String id;
-    private Instant date;
+    private Instant date = Instant.now();
     private String title;
     private String body;
     @DBRef
@@ -28,7 +28,7 @@ public class Post implements Serializable {
 
     public Post(String id, Instant date, String title, String body, User author) {
         this.id = id;
-        this.date = Instant.now();
+        this.date = date;
         if (title == null) {
             throw new IllegalArgumentException("Title cannot be null");
         }
