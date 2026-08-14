@@ -26,7 +26,8 @@ public class Comment implements Serializable {
     public Comment() {
     }
 
-    public Comment(String text, User author, Post post) {
+    public Comment(String id, String text, User author, Post post) {
+        this.id = id;
         if (text == null) {
             throw new IllegalArgumentException("Text cannot be null");
         }
@@ -39,6 +40,10 @@ public class Comment implements Serializable {
             throw new IllegalArgumentException("Post cannot be null");
         }
         this.post = post;
+    }
+
+    public Comment(String text, User author, Post post) {
+        this(null, text, author, post);
     }
 
     public String getId() {
