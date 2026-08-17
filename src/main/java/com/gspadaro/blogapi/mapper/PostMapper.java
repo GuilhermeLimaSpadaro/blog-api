@@ -27,9 +27,4 @@ public class PostMapper {
     public static PostWithCommentsDTO toPostWithCommentsDTO(PostResponseDTO post, List<CommentResponseDTO> commentList) {
         return new PostWithCommentsDTO(post, commentList);
     }
-
-
-    public static List<PostResponseDTO> toList(List<Post> postList) {
-        return postList.stream().map(PostMapper::toResponseDTO).toList();
-    }
 }
