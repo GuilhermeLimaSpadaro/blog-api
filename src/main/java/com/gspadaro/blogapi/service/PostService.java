@@ -35,18 +35,6 @@ public class PostService {
         return PostMapper.toResponseDTO(savedPost);
     }
 
-    public void delete(String id) {
-        Post post = postRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
-        postRepository.delete(post);
-    }
-
-    public PostResponseDTO update(String id, PostRequestDTO request) {
-        Post post = postRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
-        PostMapper.updateEntity(post, request);
-        Post updatedPost = postRepository.save(post);
-        return PostMapper.toResponseDTO(updatedPost);
-    }
-
     public PostResponseDTO findById(String id) {
         Post post = postRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
         return PostMapper.toResponseDTO(post);
@@ -63,5 +51,17 @@ public class PostService {
         Post post = postRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
         List<Comment> commentList = commentRepository.findByPostId(id);
         return PostMapper.toPostWithCommentsDTO(PostMapper.toResponseDTO(post), CommentMapper.toList(commentList));
+    }
+
+    public PostResponseDTO update(String id, PostRequestDTO request) {
+        Post post = postRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
+        PostMapper.updateEntity(post, request);
+        Post updatedPost = postRepository.save(post);
+        return PostMapper.toResponseDTO(updatedPost);
+    }
+
+    public void delete(String id) {
+        Post post = postRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
+        postRepository.delete(post);
     }
 }
