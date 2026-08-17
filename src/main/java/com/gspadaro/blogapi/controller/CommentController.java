@@ -27,6 +27,11 @@ public class CommentController {
         return ResponseEntity.created(uri).body(comment);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<CommentResponseDTO> findById(@PathVariable String id) {
+        return ResponseEntity.ok().body(commentService.findById(id));
+    }
+
     @PutMapping(value = "/{id}")
     public ResponseEntity<CommentResponseDTO> update(@PathVariable String id, @RequestBody CommentRequestDTO request) {
         CommentResponseDTO comment = commentService.update(id, request);
@@ -37,10 +42,5 @@ public class CommentController {
     public ResponseEntity<Void> delete(@PathVariable String id) {
         commentService.delete(id);
         return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping
-    public ResponseEntity<List<CommentResponseDTO>> listAll() {
-        return ResponseEntity.ok().body(commentService.findAll());
     }
 }
