@@ -28,17 +28,6 @@ public class PostController {
         return ResponseEntity.created(uri).body(post);
     }
 
-    @DeleteMapping(value = "/{id}")
-    public ResponseEntity<Void> delete(@PathVariable String id) {
-        postService.delete(id);
-        return ResponseEntity.noContent().build();
-    }
-
-    @PutMapping(value = "/{id}")
-    public ResponseEntity<PostResponseDTO> update(@PathVariable String id, @RequestBody PostRequestDTO request) {
-        return ResponseEntity.ok().body(postService.update(id, request));
-    }
-
     @GetMapping(value = "/{id}")
     public ResponseEntity<PostResponseDTO> findById(@PathVariable String id) {
         return ResponseEntity.ok().body(postService.findById(id));
@@ -53,5 +42,16 @@ public class PostController {
     @GetMapping("/comment/{id}")
     public ResponseEntity<PostWithCommentsDTO> listAllComments(@PathVariable String id) {
         return ResponseEntity.ok().body(postService.listAllComments(id));
+    }
+
+    @PutMapping(value = "/{id}")
+    public ResponseEntity<PostResponseDTO> update(@PathVariable String id, @RequestBody PostRequestDTO request) {
+        return ResponseEntity.ok().body(postService.update(id, request));
+    }
+
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<Void> delete(@PathVariable String id) {
+        postService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }
