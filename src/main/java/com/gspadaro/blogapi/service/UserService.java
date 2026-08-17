@@ -9,8 +9,6 @@ import com.gspadaro.blogapi.mapper.UserMapper;
 import com.gspadaro.blogapi.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 public class UserService {
     private final UserRepository userRepository;
@@ -25,9 +23,9 @@ public class UserService {
         return UserMapper.toDetailsDTO(savedUser);
     }
 
-    public void delete(String id) {
+    public UserResponseDTO findById(String id) {
         User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
-        userRepository.delete(user);
+        return new UserResponseDTO(user.getId(), user.getName(), user.getEmail(), user.getPhone());
     }
 
     public UserResponseDTO update(String id, UserRequestDTO request) {
@@ -37,13 +35,8 @@ public class UserService {
         return UserMapper.toResponseDTO(updatedUser);
     }
 
-    public UserResponseDTO findById(String id) {
+    public void delete(String id) {
         User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
-        return new UserResponseDTO(user.getId(), user.getName(), user.getEmail(), user.getPhone());
-    }
-
-    public List<UserResponseDTO> findAll() {
-        List<User> userList = userRepository.findAll();
-        return userList.stream().map(UserMapper::toResponseDTO).toList();
+        userRepository.delete(user);
     }
 }
