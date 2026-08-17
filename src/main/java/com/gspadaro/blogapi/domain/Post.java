@@ -22,7 +22,6 @@ public class Post implements Serializable {
     @DBRef
     private User author;
 
-
     public Post() {
     }
 
