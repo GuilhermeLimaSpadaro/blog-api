@@ -28,10 +28,10 @@ public class UserController {
         return ResponseEntity.created(uri).body(user);
     }
 
-    @DeleteMapping(value = "/{id}")
-    public ResponseEntity<Void> delete(@PathVariable String id) {
-        service.delete(id);
-        return ResponseEntity.noContent().build();
+    @GetMapping(value = "/{id}")
+    public ResponseEntity<UserResponseDTO> findById(@PathVariable String id) {
+        UserResponseDTO user = service.findById(id);
+        return ResponseEntity.ok().body(user);
     }
 
     @PutMapping(value = "/{id}")
@@ -39,14 +39,9 @@ public class UserController {
         return ResponseEntity.ok().body(service.update(id, user));
     }
 
-    @GetMapping(value = "/{id}")
-    public ResponseEntity<UserResponseDTO> findById(@PathVariable String id) {
-        UserResponseDTO user = service.findById(id);
-        return ResponseEntity.ok().body(user);
-    }
-
-    @GetMapping
-    public ResponseEntity<List<UserResponseDTO>> findAll() {
-        return ResponseEntity.ok().body(service.findAll());
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<Void> delete(@PathVariable String id) {
+        service.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }
