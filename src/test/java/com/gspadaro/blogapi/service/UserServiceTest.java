@@ -2,6 +2,7 @@ package com.gspadaro.blogapi.service;
 
 import com.gspadaro.blogapi.domain.User;
 import com.gspadaro.blogapi.dto.UserRequestDTO;
+import com.gspadaro.blogapi.exception.ResourceNotFoundException;
 import com.gspadaro.blogapi.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -16,8 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -32,79 +32,108 @@ class UserServiceTest {
     @Captor
     private ArgumentCaptor<User> captor;
 
-    private User saved;
-    private UserRequestDTO input;
+    private User savedUser;
+    private UserRequestDTO requestUser;
 
     @BeforeEach
     void setUp() {
-        saved = new User(UUID.randomUUID().toString(), "Guilherme", "guilhermespadaro@gmail.com", "11955447766", "13ABC234");
-        input = new UserRequestDTO("Guilherme", "guilhermespadaro@gmail.com", "1177886655", "22@@ABC66");
+        savedUser = new User(UUID.randomUUID().toString(), "Guilherme", "guilhermespadaro@gmail.com", "11955447766", "13ABC234");
+        requestUser = new UserRequestDTO("Bob Grey", "bob@gmail.com", "22222", "11111");
     }
 
     @Test
     @DisplayName("Should create a user successfully.")
     void shouldCreateUser() {
         //Arrange
-        doReturn(saved).when(userRepository).save(any(User.class));
+        when(userRepository.save(any(User.class))).thenReturn(savedUser);
         //Act
-        var result = userService.create(input);
+        var result = userService.create(requestUser);
         //Assert
         verify(userRepository).save(captor.capture());
-        var userCaptured = captor.getValue();
+        var userCaptor = captor.getValue();
         assertNotNull(result);
-        assertEquals(saved.getId(), result.id());
-        assertEquals(saved.getName(), result.name());
-        assertEquals(input.name(), userCaptured.getName());
-        assertEquals(input.email(), userCaptured.getEmail());
-        assertEquals(input.phone(), userCaptured.getPhone());
-    }
-
-    @Test
-    @DisplayName("Should delete user successfully")
-    void shouldDeleteUser() {
-        //Arrange
-        doReturn(Optional.of(saved)).when(userRepository).findById(saved.getId());
-        doNothing().when(userRepository).delete(saved);
-        //Act
-        userService.delete(saved.getId());
-        //Assert
-        verify(userRepository).delete(saved);
-    }
-
-    @Test
-    @DisplayName("Should update user")
-    void shouldUpdateUser() {
-        //Arrange
-        doReturn(Optional.of(saved)).when(userRepository).findById(saved.getId());
-        doReturn(saved).when(userRepository).save(any(User.class));
-        //Act
-        var result = userService.update(saved.getId(), input);
-        //Assert
-        verify(userRepository).save(captor.capture());
-        var userCaptured = captor.getValue();
-        assertNotNull(result);
-        assertEquals(saved.getId(), result.id());
-        assertEquals(saved.getName(), result.name());
-        assertEquals(saved.getEmail(), result.email());
-        assertEquals(saved.getPhone(), result.phone());
-        assertEquals(input.name(), userCaptured.getName());
-        assertEquals(input.email(), userCaptured.getEmail());
-        assertEquals(input.phone(), userCaptured.getPhone());
+        assertEquals(savedUser.getId(), result.id());
+        assertEquals(savedUser.getName(), result.name());
+        assertEquals(requestUser.name(), userCaptor.getName());
+        assertEquals(requestUser.email(), userCaptor.getEmail());
+        assertEquals(requestUser.phone(), userCaptor.getPhone());
     }
 
     @Test
     @DisplayName("Should find user by id successfully")
     void shouldFindUserById() {
         //Arrange
-        doReturn(Optional.of(saved)).when(userRepository).findById(saved.getId());
+        when(userRepository.findById(savedUser.getId())).thenReturn(Optional.of(savedUser));
         //Act
-        var result = userService.findById(saved.getId());
+        var result = userService.findById(savedUser.getId());
         //Assert
-        verify(userRepository).findById(saved.getId());
+        verify(userRepository).findById(savedUser.getId());
         assertNotNull(result);
-        assertEquals(saved.getId(), result.id());
-        assertEquals(saved.getName(), result.name());
-        assertEquals(saved.getEmail(), result.email());
-        assertEquals(saved.getPhone(), result.phone());
+        assertEquals(savedUser.getId(), result.id());
+        assertEquals(savedUser.getName(), result.name());
+        assertEquals(savedUser.getEmail(), result.email());
+        assertEquals(savedUser.getPhone(), result.phone());
+    }
+
+    @Test
+    @DisplayName("Should Throw Exception When User Not Found")
+    void shouldThrowExceptionWhenUserNotFound() {
+        //Arrange
+        when(userRepository.findById(savedUser.getId())).thenReturn(Optional.empty());
+        //Act & Assert
+        assertThrows(ResourceNotFoundException.class, () -> userService.findById(savedUser.getId()));
+    }
+
+    @Test
+    @DisplayName("Should update user")
+    void shouldUpdateUser() {
+        //Arrange
+        when(userRepository.findById(savedUser.getId())).thenReturn(Optional.of(savedUser));
+        when(userRepository.save(any(User.class))).thenReturn(savedUser);
+        //Act
+        var result = userService.update(savedUser.getId(), requestUser);
+        //Assert
+        verify(userRepository).findById(savedUser.getId());
+        verify(userRepository).save(captor.capture());
+        var userCaptor = captor.getValue();
+        assertNotNull(result);
+        assertEquals(savedUser.getId(), result.id());
+        assertEquals(savedUser.getName(), result.name());
+        assertEquals(savedUser.getEmail(), result.email());
+        assertEquals(savedUser.getPhone(), result.phone());
+        assertEquals(requestUser.name(), userCaptor.getName());
+        assertEquals(requestUser.email(), userCaptor.getEmail());
+        assertEquals(requestUser.phone(), userCaptor.getPhone());
+    }
+
+    @Test
+    @DisplayName("Should Throw Exception When Update User")
+    void shouldThrowExceptionWhenUpdateUser() {
+        //Arrange
+        when(userRepository.findById(savedUser.getId())).thenReturn(Optional.empty());
+        //Act & Assert
+        assertThrows(ResourceNotFoundException.class, () -> userService.update(savedUser.getId(), requestUser));
+    }
+
+    @Test
+    @DisplayName("Should delete user successfully")
+    void shouldDeleteUser() {
+        //Arrange
+        when(userRepository.findById(savedUser.getId())).thenReturn(Optional.of(savedUser));
+        doNothing().when(userRepository).delete(savedUser);
+        //Act
+        userService.delete(savedUser.getId());
+        //Assert
+        verify(userRepository).findById(savedUser.getId());
+        verify(userRepository).delete(savedUser);
+    }
+
+    @Test
+    @DisplayName("Should Throw Exception When Delete User")
+    void shouldThrowExceptionWhenDeleteUser() {
+        //Arrange
+        when(userRepository.findById(savedUser.getId())).thenReturn(Optional.empty());
+        //Act & Assert
+        assertThrows(ResourceNotFoundException.class, () -> userService.delete(savedUser.getId()));
     }
 }
