@@ -12,8 +12,6 @@ import com.gspadaro.blogapi.repository.PostRepository;
 import com.gspadaro.blogapi.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 public class CommentService {
     private final CommentRepository commentRepository;
@@ -34,6 +32,11 @@ public class CommentService {
         return CommentMapper.toResponseDTO(savedComment);
     }
 
+    public CommentResponseDTO findById(String id) {
+        Comment comment = commentRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
+        return CommentMapper.toResponseDTO(comment);
+    }
+
     public CommentResponseDTO update(String id, CommentRequestDTO request) {
         Comment comment = commentRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
         CommentMapper.updateEntity(comment, request);
@@ -46,8 +49,5 @@ public class CommentService {
         commentRepository.delete(comment);
     }
 
-    public List<CommentResponseDTO> findAll() {
-        List<Comment> commentList = commentRepository.findAll();
-        return CommentMapper.toList(commentList);
-    }
+
 }
