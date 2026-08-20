@@ -15,7 +15,7 @@ import java.time.Instant;
 import java.util.List;
 
 @Configuration
-@Profile(value = "test")
+@Profile(value = "dev")
 public class Instantiation implements CommandLineRunner {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
