@@ -1,18 +1,14 @@
 package com.gspadaro.blogapi.mapper;
 
 import com.gspadaro.blogapi.domain.Post;
-import com.gspadaro.blogapi.domain.User;
-import com.gspadaro.blogapi.dto.CommentResponseDTO;
-import com.gspadaro.blogapi.dto.PostRequestDTO;
-import com.gspadaro.blogapi.dto.PostResponseDTO;
-import com.gspadaro.blogapi.dto.PostWithCommentsDTO;
+import com.gspadaro.blogapi.dto.*;
 
 import java.util.List;
 
 public class PostMapper {
 
-    public static Post toEntity(PostRequestDTO request, User user) {
-        return new Post(request.title(), request.body(), user);
+    public static Post toEntity(PostRequestDTO request) {
+        return new Post(request.title(), request.body(), request.authorId());
     }
 
     public static void updateEntity(Post post, PostRequestDTO request) {
@@ -20,8 +16,8 @@ public class PostMapper {
         post.setBody(request.body());
     }
 
-    public static PostResponseDTO toResponseDTO(Post post) {
-        return new PostResponseDTO(post.getId(), post.getDate(), post.getTitle(), post.getBody(), UserMapper.toDetailsDTO(post.getAuthor()));
+    public static PostResponseDTO toResponseDTO(Post post, UserDetailsDTO user) {
+        return new PostResponseDTO(post.getId(), post.getDate(), post.getTitle(), post.getBody(), user);
     }
 
     public static PostWithCommentsDTO toPostWithCommentsDTO(PostResponseDTO post, List<CommentResponseDTO> commentList) {
