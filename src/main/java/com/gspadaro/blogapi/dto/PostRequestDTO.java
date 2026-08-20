@@ -1,4 +1,8 @@
 package com.gspadaro.blogapi.dto;
 
-public record PostRequestDTO(String title, String body, String authorId) {
+import jakarta.validation.constraints.NotBlank;
+
+public record PostRequestDTO(@NotBlank String title,
+                             @NotBlank String body,
+                             @NotBlank String authorId) {
 }
