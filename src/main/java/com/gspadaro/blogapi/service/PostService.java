@@ -1,17 +1,10 @@
 package com.gspadaro.blogapi.service;
 
-import com.gspadaro.blogapi.domain.Comment;
 import com.gspadaro.blogapi.domain.Post;
-import com.gspadaro.blogapi.domain.User;
-import com.gspadaro.blogapi.dto.PostRequestDTO;
-import com.gspadaro.blogapi.dto.PostResponseDTO;
-import com.gspadaro.blogapi.dto.PostWithCommentsDTO;
+import com.gspadaro.blogapi.dto.*;
 import com.gspadaro.blogapi.exception.ResourceNotFoundException;
-import com.gspadaro.blogapi.mapper.CommentMapper;
 import com.gspadaro.blogapi.mapper.PostMapper;
-import com.gspadaro.blogapi.repository.CommentRepository;
 import com.gspadaro.blogapi.repository.PostRepository;
-import com.gspadaro.blogapi.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,49 +12,53 @@ import java.util.List;
 @Service
 public class PostService {
     private final PostRepository postRepository;
-    private final UserRepository userRepository;
-    private final CommentRepository commentRepository;
+    private final UserService userService;
+    private final CommentService commentService;
 
-    public PostService(PostRepository postRepository, UserRepository userRepository, CommentRepository commentRepository) {
+    public PostService(PostRepository postRepository, UserService userService, CommentService commentService) {
         this.postRepository = postRepository;
-        this.userRepository = userRepository;
-        this.commentRepository = commentRepository;
+        this.userService = userService;
+        this.commentService = commentService;
     }
 
     public PostResponseDTO create(PostRequestDTO request) {
-        User user = userRepository.findById(request.authorId()).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
-        Post post = PostMapper.toEntity(request, user);
+        Post post = PostMapper.toEntity(request);
+        UserDetailsDTO user = userService.findDetailsById(post.getAuthorId());
         Post savedPost = postRepository.save(post);
-        return PostMapper.toResponseDTO(savedPost);
+        return PostMapper.toResponseDTO(savedPost, user);
     }
 
-    public PostResponseDTO findById(String id) {
-        Post post = postRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
-        return PostMapper.toResponseDTO(post);
+    public PostResponseDTO findById(String postId) {
+        Post post = postRepository.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
+        UserDetailsDTO user = userService.findDetailsById(post.getAuthorId());
+        return PostMapper.toResponseDTO(post, user);
     }
 
     //Buscar post através do id do Usuário.
-    public List<PostResponseDTO> findByAuthorId(String id) {
-        List<Post> postList = postRepository.findByAuthorId(id);
-        return postList.stream().map(PostMapper::toResponseDTO).toList();
+    public List<PostResponseDTO> findByAuthorId(String authorId) {
+        List<Post> postList = postRepository.findByAuthorId(authorId);
+        UserDetailsDTO user = userService.findDetailsById(authorId);
+        return postList.stream().map(post -> PostMapper.toResponseDTO(post, user)).toList();
     }
 
     //Buscar Post e os comentarios
-    public PostWithCommentsDTO listAllComments(String id) {
-        Post post = postRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
-        List<Comment> commentList = commentRepository.findByPostId(id);
-        return PostMapper.toPostWithCommentsDTO(PostMapper.toResponseDTO(post), CommentMapper.toList(commentList));
+    public PostWithCommentsDTO listAllComments(String postId) {
+        Post post = postRepository.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
+        UserDetailsDTO user = userService.findDetailsById(post.getAuthorId());
+        List<CommentResponseDTO> commentsList = commentService.findAllCommentsByPostId(postId);
+        return PostMapper.toPostWithCommentsDTO(PostMapper.toResponseDTO(post, user), commentsList);
     }
 
-    public PostResponseDTO update(String id, PostRequestDTO request) {
-        Post post = postRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
+    public PostResponseDTO update(String postId, PostRequestDTO request) {
+        Post post = postRepository.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
+        UserDetailsDTO user = userService.findDetailsById(post.getAuthorId());
         PostMapper.updateEntity(post, request);
         Post updatedPost = postRepository.save(post);
-        return PostMapper.toResponseDTO(updatedPost);
+        return PostMapper.toResponseDTO(updatedPost, user);
     }
 
-    public void delete(String id) {
-        Post post = postRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
+    public void delete(String postId) {
+        Post post = postRepository.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
         postRepository.delete(post);
     }
 }

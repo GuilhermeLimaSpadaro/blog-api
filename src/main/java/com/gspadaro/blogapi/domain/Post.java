@@ -1,7 +1,6 @@
 package com.gspadaro.blogapi.domain;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serial;
@@ -19,13 +18,12 @@ public class Post implements Serializable {
     private Instant date = Instant.now();
     private String title;
     private String body;
-    @DBRef
-    private User author;
+    private String authorId;
 
     public Post() {
     }
 
-    public Post(String id, Instant date, String title, String body, User author) {
+    public Post(String id, Instant date, String title, String body, String authorId) {
         this.id = id;
         this.date = date;
         if (title == null) {
@@ -36,13 +34,13 @@ public class Post implements Serializable {
             throw new IllegalArgumentException("Body cannot be null");
         }
         this.body = body;
-        if (author == null) {
+        if (authorId == null) {
             throw new IllegalArgumentException("Author cannot be null");
         }
-        this.author = author;
+        this.authorId = authorId;
     }
 
-    public Post(String title, String body, User author) {
+    public Post(String title, String body, String author) {
         this(null, null, title, body, author);
     }
 
@@ -78,12 +76,12 @@ public class Post implements Serializable {
         this.body = body;
     }
 
-    public User getAuthor() {
-        return author;
+    public String getAuthorId() {
+        return authorId;
     }
 
-    public void setAuthor(User author) {
-        this.author = author;
+    public void setAuthorId(String authorId) {
+        this.authorId = authorId;
     }
 
     @Override

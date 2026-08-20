@@ -1,7 +1,6 @@
 package com.gspadaro.blogapi.domain;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serial;
@@ -18,32 +17,30 @@ public class Comment implements Serializable {
     private String id;
     private String text;
     private Instant date = Instant.now();
-    @DBRef
-    private User author;
-    @DBRef
-    private Post post;
+    private String authorId;
+    private String postId;
 
     public Comment() {
     }
 
-    public Comment(String id, String text, User author, Post post) {
+    public Comment(String id, String text, String authorId, String postId) {
         this.id = id;
         if (text == null) {
             throw new IllegalArgumentException("Text cannot be null");
         }
         this.text = text;
-        if (author == null) {
+        if (authorId == null) {
             throw new IllegalArgumentException("Author cannot be null");
         }
-        this.author = author;
-        if (post == null) {
+        this.authorId = authorId;
+        if (postId == null) {
             throw new IllegalArgumentException("Post cannot be null");
         }
-        this.post = post;
+        this.postId = postId;
     }
 
-    public Comment(String text, User author, Post post) {
-        this(null, text, author, post);
+    public Comment(String text, String authorId, String postId) {
+        this(null, text, authorId, postId);
     }
 
     public String getId() {
@@ -70,20 +67,20 @@ public class Comment implements Serializable {
         this.date = date;
     }
 
-    public User getAuthor() {
-        return author;
+    public String getAuthorId() {
+        return authorId;
     }
 
-    public void setAuthor(User author) {
-        this.author = author;
+    public void setAuthorId(String authorId) {
+        this.authorId = authorId;
     }
 
-    public Post getPost() {
-        return post;
+    public String getPostId() {
+        return postId;
     }
 
-    public void setPost(Post post) {
-        this.post = post;
+    public void setPostId(String postId) {
+        this.postId = postId;
     }
 
     @Override
