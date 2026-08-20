@@ -4,6 +4,7 @@ import com.gspadaro.blogapi.dto.UserDetailsDTO;
 import com.gspadaro.blogapi.dto.UserRequestDTO;
 import com.gspadaro.blogapi.dto.UserResponseDTO;
 import com.gspadaro.blogapi.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -21,7 +22,7 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<UserDetailsDTO> create(@RequestBody UserRequestDTO userRequest) {
+    public ResponseEntity<UserDetailsDTO> create(@RequestBody @Valid UserRequestDTO userRequest) {
         UserDetailsDTO user = service.create(userRequest);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(user.id()).toUri();
         return ResponseEntity.created(uri).body(user);
@@ -34,7 +35,7 @@ public class UserController {
     }
 
     @PutMapping(value = "/{id}")
-    public ResponseEntity<UserResponseDTO> update(@PathVariable String id, @RequestBody UserRequestDTO user) {
+    public ResponseEntity<UserResponseDTO> update(@PathVariable String id, @RequestBody @Valid UserRequestDTO user) {
         return ResponseEntity.ok().body(service.update(id, user));
     }
 
