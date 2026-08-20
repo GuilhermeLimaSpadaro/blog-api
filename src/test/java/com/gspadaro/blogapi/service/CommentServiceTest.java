@@ -6,8 +6,6 @@ import com.gspadaro.blogapi.domain.User;
 import com.gspadaro.blogapi.dto.CommentRequestDTO;
 import com.gspadaro.blogapi.exception.ResourceNotFoundException;
 import com.gspadaro.blogapi.repository.CommentRepository;
-import com.gspadaro.blogapi.repository.PostRepository;
-import com.gspadaro.blogapi.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,10 +28,6 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class CommentServiceTest {
     @Mock
-    private UserRepository userRepository;
-    @Mock
-    private PostRepository postRepository;
-    @Mock
     private CommentRepository commentRepository;
     @InjectMocks
     private CommentService commentService;
@@ -48,8 +42,8 @@ class CommentServiceTest {
     @BeforeEach
     void setUp() {
         savedUser = new User(UUID.randomUUID().toString(), "Guilherme", "guilhermespadaro@gmail.com", "11955447766", "13ABC234");
-        savedPost = new Post(UUID.randomUUID().toString(), Instant.now(), "Bom dia!", "Como o dia está lindo hoje!", savedUser);
-        savedComment = new Comment(UUID.randomUUID().toString(), "Andar de skate é demais!", savedUser, savedPost);
+        savedPost = new Post(UUID.randomUUID().toString(), Instant.now(), "Bom dia!", "Como o dia está lindo hoje!", savedUser.getId());
+        savedComment = new Comment(UUID.randomUUID().toString(), "Andar de skate é demais!", savedUser.getId(), savedPost.getId());
         commentRequest = new CommentRequestDTO("Que cachorro lindo!", savedUser.getId(), savedPost.getId());
     }
 
@@ -57,44 +51,21 @@ class CommentServiceTest {
     @DisplayName("Should create a comment successfully.")
     void shouldCreateComment() {
         //Arrange
-        when(userRepository.findById(savedUser.getId())).thenReturn(Optional.of(savedUser));
-        when(postRepository.findById(savedPost.getId())).thenReturn(Optional.of(savedPost));
         when(commentRepository.save(any(Comment.class))).thenReturn(savedComment);
         //Act
         var result = commentService.create(commentRequest);
         //Assert
-        verify(userRepository).findById(savedUser.getId());
-        verify(postRepository).findById(savedPost.getId());
         verify(commentRepository).save(captor.capture());
         var commentCaptor = captor.getValue();
         assertNotNull(result);
         assertEquals(savedComment.getId(), result.id());
         assertEquals(savedComment.getText(), result.text());
         assertEquals(savedComment.getDate(), result.date());
-        assertEquals(savedComment.getAuthor().getId(), result.author().id());
-        assertEquals(savedComment.getPost().getId(), result.postId());
+        assertEquals(savedComment.getAuthorId(), result.authorId());
+        assertEquals(savedComment.getPostId(), result.postId());
         assertEquals(commentRequest.text(), commentCaptor.getText());
-        assertEquals(commentRequest.authorId(), commentCaptor.getAuthor().getId());
-        assertEquals(commentRequest.postId(), commentCaptor.getPost().getId());
-    }
-
-    @Test
-    @DisplayName("Should throw exception if author not found in create comment")
-    void shouldThrowExceptionIfAuthorNotFound() {
-        //Arrange
-        when(userRepository.findById(savedUser.getId())).thenReturn(Optional.empty());
-        //Act & Assert
-        assertThrows(ResourceNotFoundException.class, () -> commentService.create(commentRequest));
-    }
-
-    @Test
-    @DisplayName("Should throw exception if post not found in create comment")
-    void shouldThrowExceptionIfPostNotFound() {
-        //Arrange
-        when(userRepository.findById(savedUser.getId())).thenReturn(Optional.of(savedUser));
-        when(postRepository.findById(savedPost.getId())).thenReturn(Optional.empty());
-        //Act & Assert
-        assertThrows(ResourceNotFoundException.class, () -> commentService.create(commentRequest));
+        assertEquals(commentRequest.authorId(), commentCaptor.getAuthorId());
+        assertEquals(commentRequest.postId(), commentCaptor.getPostId());
     }
 
     @Test
@@ -110,8 +81,8 @@ class CommentServiceTest {
         assertEquals(savedComment.getId(), result.id());
         assertEquals(savedComment.getText(), result.text());
         assertEquals(savedComment.getDate(), result.date());
-        assertEquals(savedComment.getAuthor().getId(), result.author().id());
-        assertEquals(savedComment.getPost().getId(), result.postId());
+        assertEquals(savedComment.getAuthorId(), result.authorId());
+        assertEquals(savedComment.getPostId(), result.postId());
     }
 
     @Test
@@ -139,11 +110,11 @@ class CommentServiceTest {
         assertEquals(savedComment.getId(), result.id());
         assertEquals(savedComment.getText(), result.text());
         assertEquals(savedComment.getDate(), result.date());
-        assertEquals(savedComment.getAuthor().getId(), result.author().id());
-        assertEquals(savedComment.getPost().getId(), result.postId());
+        assertEquals(savedComment.getAuthorId(), result.authorId());
+        assertEquals(savedComment.getPostId(), result.postId());
         assertEquals(commentRequest.text(), commentCaptor.getText());
-        assertEquals(commentRequest.authorId(), commentCaptor.getAuthor().getId());
-        assertEquals(commentRequest.postId(), commentCaptor.getPost().getId());
+        assertEquals(commentRequest.authorId(), commentCaptor.getAuthorId());
+        assertEquals(commentRequest.postId(), commentCaptor.getPostId());
     }
 
     @Test
