@@ -5,6 +5,7 @@ import com.gspadaro.blogapi.domain.Post;
 import com.gspadaro.blogapi.domain.User;
 import com.gspadaro.blogapi.dto.PostRequestDTO;
 import com.gspadaro.blogapi.dto.PostResponseDTO;
+import com.gspadaro.blogapi.exception.ResourceNotFoundException;
 import com.gspadaro.blogapi.repository.CommentRepository;
 import com.gspadaro.blogapi.repository.PostRepository;
 import com.gspadaro.blogapi.repository.UserRepository;
@@ -50,15 +51,14 @@ class PostServiceTest {
         savedUser = new User(UUID.randomUUID().toString(), "Guilherme", "guilhermespadaro@gmail.com", "11955447766", "13ABC234");
         savedPost = new Post(UUID.randomUUID().toString(), Instant.now(), "Bom dia!", "Como o dia esta lindo hoje!", savedUser);
         postRequest = new PostRequestDTO("Bom tarde!", "Vamos tomar um cafe?!", savedUser.getId());
-
     }
 
     @Test
     @DisplayName("Should create a post successfully.")
     void shouldCreatePost() {
         //Arrange
-        doReturn(Optional.of(savedUser)).when(userRepository).findById(postRequest.authorId());
-        doReturn(savedPost).when(postRepository).save(any(Post.class));
+        when(userRepository.findById(postRequest.authorId())).thenReturn(Optional.of(savedUser));
+        when(postRepository.save(any(Post.class))).thenReturn(savedPost);
         //Act
         var result = postService.create(postRequest);
         //Assert
@@ -77,46 +77,19 @@ class PostServiceTest {
     }
 
     @Test
-    @DisplayName("Should delete post successfully")
-    void shouldDeletePost() {
+    @DisplayName("Should throw exception if user noot found in create post")
+    void shouldThrowExceptionIfUserNotFound() {
         //Arrange
-        doReturn(Optional.of(savedPost)).when(postRepository).findById(savedPost.getId());
-        doNothing().when(postRepository).delete(savedPost);
-        //Act
-        postService.delete(savedPost.getId());
-        //Assert
-        verify(postRepository).findById(savedPost.getId());
-        verify(postRepository).delete(savedPost);
-    }
-
-    @Test
-    @DisplayName("Should update post")
-    void shouldUpdatePost() {
-        //Arrange
-        doReturn(Optional.of(savedPost)).when(postRepository).findById(savedPost.getId());
-        doReturn(savedPost).when(postRepository).save(any(Post.class));
-        //Act
-        var result = postService.update(savedPost.getId(), postRequest);
-        //Assert
-        verify(postRepository).findById(savedPost.getId());
-        verify(postRepository).save(captor.capture());
-        var postCaptor = captor.getValue();
-        assertNotNull(postCaptor);
-        assertEquals(savedPost.getId(), result.id());
-        assertEquals(savedPost.getDate(), result.date());
-        assertEquals(savedPost.getTitle(), result.title());
-        assertEquals(savedPost.getBody(), result.body());
-        assertEquals(savedPost.getAuthor().getId(), result.author().id());
-        assertEquals(postRequest.title(), postCaptor.getTitle());
-        assertEquals(postRequest.body(), postCaptor.getBody());
-        assertEquals(postRequest.authorId(), postCaptor.getAuthor().getId());
+        when(userRepository.findById(savedUser.getId())).thenReturn(Optional.empty());
+        //Act & Assert
+        assertThrows(ResourceNotFoundException.class, () -> postService.create(postRequest));
     }
 
     @Test
     @DisplayName("Should find post by id successfully")
     void shouldFindPostById() {
         //Arrange
-        doReturn(Optional.of(savedPost)).when(postRepository).findById(savedPost.getId());
+        when(postRepository.findById(savedPost.getId())).thenReturn(Optional.of(savedPost));
         //Act
         var result = postService.findById(savedPost.getId());
         //Assert
@@ -129,13 +102,22 @@ class PostServiceTest {
     }
 
     @Test
+    @DisplayName("Should throw exception when post not found")
+    void shouldThrowExceptionWhenPostNotFound() {
+        //Arrange
+        when(postRepository.findById(savedPost.getId())).thenReturn(Optional.empty());
+        //Act & Assert
+        assertThrows(ResourceNotFoundException.class, () -> postService.findById(savedPost.getId()));
+    }
+
+    @Test
     @DisplayName("Should find post by user id")
     void shouldFindPostByUserId() {
         //Arrange
         Post savedPost01 = new Post(UUID.randomUUID().toString(), Instant.now(), "Partiu viagem", "Vou viajar para São Paulo. Abraços!", savedUser);
         Post savedPost02 = new Post(UUID.randomUUID().toString(), Instant.now(), "Bom dia", "Acordei feliz hoje!", savedUser);
         List<Post> postResponseList = List.of(savedPost, savedPost01, savedPost02);
-        doReturn(postResponseList).when(postRepository).findByAuthorId(savedUser.getId());
+        when(postRepository.findByAuthorId(savedUser.getId())).thenReturn(postResponseList);
         //Act
         var result = postService.findByAuthorId(savedUser.getId());
         //Assert
@@ -156,8 +138,8 @@ class PostServiceTest {
         Comment savedComment01 = new Comment(UUID.randomUUID().toString(), "Boa viagem mano!", savedUser, savedPost);
         Comment savedComment02 = new Comment(UUID.randomUUID().toString(), "Aproveite!", savedUser, savedPost);
         List<Comment> commentList = List.of(savedComment, savedComment01, savedComment02);
-        doReturn(Optional.of(savedPost)).when(postRepository).findById(savedPost.getId());
-        doReturn(commentList).when(commentRepository).findByPostId(savedPost.getId());
+        when(postRepository.findById(savedPost.getId())).thenReturn(Optional.of(savedPost));
+        when(commentRepository.findByPostId(savedPost.getId())).thenReturn(commentList);
         //Act
         var result = postService.listAllComments(savedPost.getId());
         //Assert
@@ -179,5 +161,68 @@ class PostServiceTest {
         assertEquals(commentsFound.get().getAuthor().getId(), returnComments.get().author().id());
         assertEquals(commentsFound.get().getAuthor().getName(), returnComments.get().author().name());
         assertEquals(commentsFound.get().getPost().getId(), returnComments.get().postId());
+    }
+
+    @Test
+    @DisplayName("Should throw exception if post with comments not found")
+    void shouldThrowExceptionIfPostWithCommentsNotFound() {
+        //Arrange
+        when(postRepository.findById(savedPost.getId())).thenReturn(Optional.empty());
+        //Act & Assert
+        assertThrows(ResourceNotFoundException.class, () -> postService.listAllComments(savedPost.getId()));
+    }
+
+    @Test
+    @DisplayName("Should update post")
+    void shouldUpdatePost() {
+        //Arrange
+        when(postRepository.findById(savedPost.getId())).thenReturn(Optional.of(savedPost));
+        when(postRepository.save(any(Post.class))).thenReturn(savedPost);
+        //Act
+        var result = postService.update(savedPost.getId(), postRequest);
+        //Assert
+        verify(postRepository).findById(savedPost.getId());
+        verify(postRepository).save(captor.capture());
+        var postCaptor = captor.getValue();
+        assertNotNull(postCaptor);
+        assertEquals(savedPost.getId(), result.id());
+        assertEquals(savedPost.getDate(), result.date());
+        assertEquals(savedPost.getTitle(), result.title());
+        assertEquals(savedPost.getBody(), result.body());
+        assertEquals(savedPost.getAuthor().getId(), result.author().id());
+        assertEquals(postRequest.title(), postCaptor.getTitle());
+        assertEquals(postRequest.body(), postCaptor.getBody());
+        assertEquals(postRequest.authorId(), postCaptor.getAuthor().getId());
+    }
+
+    @Test
+    @DisplayName("Should throw exception when update post")
+    void shouldThrowExceptionWhenUpdatePost() {
+        //Arrange
+        when(postRepository.findById(savedPost.getId())).thenReturn(Optional.empty());
+        //Act & Assert
+        assertThrows(ResourceNotFoundException.class, () -> postService.update(savedPost.getId(), postRequest));
+    }
+
+    @Test
+    @DisplayName("Should delete post successfully")
+    void shouldDeletePost() {
+        //Arrange
+        when(postRepository.findById(savedPost.getId())).thenReturn(Optional.of(savedPost));
+        doNothing().when(postRepository).delete(savedPost);
+        //Act
+        postService.delete(savedPost.getId());
+        //Assert
+        verify(postRepository).findById(savedPost.getId());
+        verify(postRepository).delete(savedPost);
+    }
+
+    @Test
+    @DisplayName("Should throw exception when delete post")
+    void shouldThrowExceptionWhenDeletePost() {
+        //Arrange
+        when(postRepository.findById(savedPost.getId())).thenReturn(Optional.empty());
+        //Act & Assert
+        assertThrows(ResourceNotFoundException.class, () -> postService.delete(savedPost.getId()));
     }
 }
