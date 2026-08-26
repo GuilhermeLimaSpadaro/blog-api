@@ -9,8 +9,6 @@ import com.gspadaro.blogapi.mapper.UserMapper;
 import com.gspadaro.blogapi.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 public class UserService {
     private final UserRepository userRepository;
@@ -25,25 +23,25 @@ public class UserService {
         return UserMapper.toDetailsDTO(savedUser);
     }
 
-    public void delete(String id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
-        userRepository.delete(user);
+    public UserResponseDTO findById(String userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
+        return UserMapper.toResponseDTO(user);
     }
 
-    public UserResponseDTO update(String id, UserRequestDTO request) {
-        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
+    public UserDetailsDTO findDetailsById(String userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
+        return UserMapper.toDetailsDTO(user);
+    }
+
+    public UserResponseDTO update(String userId, UserRequestDTO request) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
         UserMapper.updateEntity(user, request);
         User updatedUser = userRepository.save(user);
         return UserMapper.toResponseDTO(updatedUser);
     }
 
-    public UserResponseDTO findById(String id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
-        return new UserResponseDTO(user.getId(), user.getName(), user.getEmail(), user.getPhone());
-    }
-
-    public List<UserResponseDTO> findAll() {
-        List<User> userList = userRepository.findAll();
-        return userList.stream().map(UserMapper::toResponseDTO).toList();
+    public void delete(String userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
+        userRepository.delete(user);
     }
 }
