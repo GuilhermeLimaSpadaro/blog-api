@@ -4,6 +4,7 @@ import com.gspadaro.blogapi.dto.PostRequestDTO;
 import com.gspadaro.blogapi.dto.PostResponseDTO;
 import com.gspadaro.blogapi.dto.PostWithCommentsDTO;
 import com.gspadaro.blogapi.service.PostService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -22,21 +23,10 @@ public class PostController {
     }
 
     @PostMapping
-    public ResponseEntity<PostResponseDTO> create(@RequestBody PostRequestDTO postRequest) {
+    public ResponseEntity<PostResponseDTO> create(@RequestBody @Valid PostRequestDTO postRequest) {
         PostResponseDTO post = postService.create(postRequest);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(post.id()).toUri();
         return ResponseEntity.created(uri).body(post);
-    }
-
-    @DeleteMapping(value = "/{id}")
-    public ResponseEntity<Void> delete(@PathVariable String id) {
-        postService.delete(id);
-        return ResponseEntity.noContent().build();
-    }
-
-    @PutMapping(value = "/{id}")
-    public ResponseEntity<PostResponseDTO> update(@PathVariable String id, @RequestBody PostRequestDTO request) {
-        return ResponseEntity.ok().body(postService.update(id, request));
     }
 
     @GetMapping(value = "/{id}")
@@ -53,5 +43,16 @@ public class PostController {
     @GetMapping("/comment/{id}")
     public ResponseEntity<PostWithCommentsDTO> listAllComments(@PathVariable String id) {
         return ResponseEntity.ok().body(postService.listAllComments(id));
+    }
+
+    @PutMapping(value = "/{id}")
+    public ResponseEntity<PostResponseDTO> update(@PathVariable String id, @RequestBody @Valid PostRequestDTO request) {
+        return ResponseEntity.ok().body(postService.update(id, request));
+    }
+
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<Void> delete(@PathVariable String id) {
+        postService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }
