@@ -1,7 +1,7 @@
 package com.gspadaro.blogapi.service;
 
-import com.gspadaro.blogapi.domain.User;
-import com.gspadaro.blogapi.dto.UserRequestDTO;
+import com.gspadaro.blogapi.model.User;
+import com.gspadaro.blogapi.dto.user.UserRequestDTO;
 import com.gspadaro.blogapi.exception.ResourceNotFoundException;
 import com.gspadaro.blogapi.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;

@@ -1,6 +1,6 @@
 package com.gspadaro.blogapi.repository;
 
-import com.gspadaro.blogapi.domain.Post;
+import com.gspadaro.blogapi.model.Post;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 

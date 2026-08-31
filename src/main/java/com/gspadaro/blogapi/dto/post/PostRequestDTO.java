@@ -1,4 +1,4 @@
-package com.gspadaro.blogapi.dto;
+package com.gspadaro.blogapi.dto.post;
 
 import jakarta.validation.constraints.NotBlank;
 

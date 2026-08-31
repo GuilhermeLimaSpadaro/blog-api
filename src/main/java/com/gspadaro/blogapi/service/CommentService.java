@@ -1,11 +1,12 @@
 package com.gspadaro.blogapi.service;
 
-import com.gspadaro.blogapi.domain.Comment;
-import com.gspadaro.blogapi.dto.CommentRequestDTO;
-import com.gspadaro.blogapi.dto.CommentResponseDTO;
+import com.gspadaro.blogapi.dto.comment.CommentRequestDTO;
+import com.gspadaro.blogapi.dto.comment.CommentResponseDTO;
 import com.gspadaro.blogapi.exception.ResourceNotFoundException;
-import com.gspadaro.blogapi.mapper.CommentMapper;
+import com.gspadaro.blogapi.mapper.custom.CommentMapper;
 import com.gspadaro.blogapi.repository.CommentRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,38 +14,39 @@ import java.util.List;
 @Service
 public class CommentService {
     private final CommentRepository commentRepository;
+    private final CommentMapper commentMapper;
+    private static final Logger logger = LoggerFactory.getLogger(CommentService.class);
 
-    public CommentService(CommentRepository commentRepository) {
+    public CommentService(CommentRepository commentRepository, CommentMapper commentMapper) {
         this.commentRepository = commentRepository;
+        this.commentMapper = commentMapper;
     }
 
     public CommentResponseDTO create(CommentRequestDTO request) {
-        Comment comment = CommentMapper.toEntity(request);
-        Comment savedComment = commentRepository.save(comment);
-        return CommentMapper.toResponseDTO(savedComment);
+        var comment = commentMapper.toEntity(request);
+        var savedComment = commentRepository.save(comment);
+        return commentMapper.toResponseDTO(savedComment);
     }
 
     public CommentResponseDTO findById(String commentId) {
-        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
-        return CommentMapper.toResponseDTO(comment);
+        var comment = commentRepository.findById(commentId).orElseThrow(() -> new ResourceNotFoundException("Comment not found"));
+        return commentMapper.toResponseDTO(comment);
     }
 
-    public List<CommentResponseDTO> findAllCommentsByPostId(String postId){
-        List<Comment> commentsList = commentRepository.findByPostId(postId);
-        return CommentMapper.toList(commentsList);
+    public List<CommentResponseDTO> findAllCommentsByPostId(String postId) {
+        var commentList = commentRepository.findByPostId(postId);
+        return commentMapper.toResponseListDTO(commentList);
     }
 
     public CommentResponseDTO update(String commentId, CommentRequestDTO request) {
-        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
-        CommentMapper.updateEntity(comment, request);
-        Comment updatedComment = commentRepository.save(comment);
-        return CommentMapper.toResponseDTO(updatedComment);
+        var comment = commentRepository.findById(commentId).orElseThrow(() -> new ResourceNotFoundException("Comment not found"));
+        commentMapper.toUpdateEntity(request, comment);
+        var updatedComment = commentRepository.save(comment);
+        return commentMapper.toResponseDTO(updatedComment);
     }
 
     public void delete(String commentId) {
-        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
+        var comment = commentRepository.findById(commentId).orElseThrow(() -> new ResourceNotFoundException("Comment not found"));
         commentRepository.delete(comment);
     }
-
-
 }

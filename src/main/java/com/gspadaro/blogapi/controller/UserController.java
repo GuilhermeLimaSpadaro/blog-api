@@ -1,8 +1,8 @@
 package com.gspadaro.blogapi.controller;
 
-import com.gspadaro.blogapi.dto.UserDetailsDTO;
-import com.gspadaro.blogapi.dto.UserRequestDTO;
-import com.gspadaro.blogapi.dto.UserResponseDTO;
+import com.gspadaro.blogapi.dto.user.UserDetailsDTO;
+import com.gspadaro.blogapi.dto.user.UserRequestDTO;
+import com.gspadaro.blogapi.dto.user.UserResponseDTO;
 import com.gspadaro.blogapi.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -12,7 +12,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 import java.util.List;
 
-@RequestMapping(value = "/users")
+@RequestMapping(value = "/api/v1/users")
 @RestController
 public class UserController {
 

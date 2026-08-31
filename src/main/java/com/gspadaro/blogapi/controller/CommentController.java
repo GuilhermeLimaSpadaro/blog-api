@@ -1,7 +1,7 @@
 package com.gspadaro.blogapi.controller;
 
-import com.gspadaro.blogapi.dto.CommentRequestDTO;
-import com.gspadaro.blogapi.dto.CommentResponseDTO;
+import com.gspadaro.blogapi.dto.comment.CommentRequestDTO;
+import com.gspadaro.blogapi.dto.comment.CommentResponseDTO;
 import com.gspadaro.blogapi.service.CommentService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -11,7 +11,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 import java.util.List;
 
-@RequestMapping(value = "/comments")
+@RequestMapping(value = "/api/v1/comments")
 @RestController
 public class CommentController {
 
@@ -28,7 +28,7 @@ public class CommentController {
         return ResponseEntity.created(uri).body(comment);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping(value = "/{id}")
     public ResponseEntity<CommentResponseDTO> findById(@PathVariable String id) {
         return ResponseEntity.ok().body(commentService.findById(id));
     }

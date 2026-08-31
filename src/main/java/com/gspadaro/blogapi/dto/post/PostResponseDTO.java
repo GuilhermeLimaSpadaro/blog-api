@@ -1,4 +1,6 @@
-package com.gspadaro.blogapi.dto;
+package com.gspadaro.blogapi.dto.post;
+
+import com.gspadaro.blogapi.dto.user.UserDetailsDTO;
 
 import java.time.Instant;
 
