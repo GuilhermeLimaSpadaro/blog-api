@@ -17,32 +17,32 @@ public class Comment implements Serializable {
     private String id;
     private String text;
     private Instant date = Instant.now();
-    private String authorId;
+    private String userId;
     private String postId;
 
     public Comment() {
     }
 
-    public Comment(String text, String authorId, String postId) {
+    public Comment(String text, String userId, String postId) {
         if (text == null) {
             throw new IllegalArgumentException("Text cannot be null");
         }
         this.text = text;
-        if (authorId == null) {
+        if (userId == null) {
             throw new IllegalArgumentException("Author cannot be null");
         }
-        this.authorId = authorId;
+        this.userId = userId;
         if (postId == null) {
             throw new IllegalArgumentException("Post cannot be null");
         }
         this.postId = postId;
     }
 
-    public Comment(String id, String text, Instant date, String authorId, String postId) {
+    public Comment(String id, String text, Instant date, String userId, String postId) {
         this.id = id;
         this.text = text;
         this.date = date;
-        this.authorId = authorId;
+        this.userId = userId;
         this.postId = postId;
     }
 
@@ -70,12 +70,12 @@ public class Comment implements Serializable {
         this.date = date;
     }
 
-    public String getAuthorId() {
-        return authorId;
+    public String getUserId() {
+        return userId;
     }
 
-    public void setAuthorId(String authorId) {
-        this.authorId = authorId;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public String getPostId() {

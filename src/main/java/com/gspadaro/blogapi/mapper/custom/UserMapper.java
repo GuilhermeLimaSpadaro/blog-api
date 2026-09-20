@@ -9,5 +9,5 @@ import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper extends ObjectMapper<User, UserRequestDTO, UserResponseDTO> {
-    UserDetailsDTO toDetailsDTO(User entity);
+    UserDetailsDTO toDetailsDTO(UserResponseDTO entity);
 }

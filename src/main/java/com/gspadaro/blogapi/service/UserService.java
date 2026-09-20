@@ -22,26 +22,37 @@ public class UserService {
         this.userMapper = userMapper;
     }
 
-    public UserDetailsDTO create(UserRequestDTO request) {
+    public UserResponseDTO create(UserRequestDTO request) {
+        logger.info("Create User.");
         User user = userMapper.toEntity(request);
         User savedUser = userRepository.save(user);
-        return userMapper.toDetailsDTO(savedUser);
+        logger.info("User successfully created. ID: {}", savedUser.getId());
+        return userMapper.toResponseDTO(savedUser);
     }
 
     public UserResponseDTO findById(String userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
+        logger.info("Finding User. ID: {}", userId);
+        User user = userRepository.findById(userId).orElseThrow(() -> {
+            logger.warn("User not found. ID: {}", userId);
+            return new ResourceNotFoundException("Resource not found");
+        });
+        logger.info("User successfully found.");
         return userMapper.toResponseDTO(user);
     }
 
     public UserResponseDTO update(String userId, UserRequestDTO request) {
+        logger.info("Update User. ID: {}", userId);
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
         userMapper.toUpdateEntity(request, user);
         User updatedUser = userRepository.save(user);
+        logger.info("User successfully updated");
         return userMapper.toResponseDTO(updatedUser);
     }
 
     public void delete(String userId) {
+        logger.info("User Delete. ID: {}", userId);
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
         userRepository.delete(user);
+        logger.info("User successfully deleted.");
     }
 }

@@ -23,30 +23,43 @@ public class CommentService {
     }
 
     public CommentResponseDTO create(CommentRequestDTO request) {
+        logger.info("Create comment.");
         var comment = commentMapper.toEntity(request);
         var savedComment = commentRepository.save(comment);
+        logger.info("Comment successfully created. CommentID: {}, PostID: {}, AuthorID: {}", savedComment.getId(), savedComment.getPostId(), savedComment.getAuthorId());
         return commentMapper.toResponseDTO(savedComment);
     }
 
     public CommentResponseDTO findById(String commentId) {
-        var comment = commentRepository.findById(commentId).orElseThrow(() -> new ResourceNotFoundException("Comment not found"));
+        logger.info("Finding Comment. ID: {}", commentId);
+        var comment = commentRepository.findById(commentId).orElseThrow(() -> {
+            logger.warn("Comment not found. ID: {}", commentId);
+            return new ResourceNotFoundException("Comment not found");
+        });
+        logger.info("Comment successfully found.");
         return commentMapper.toResponseDTO(comment);
     }
 
-    public List<CommentResponseDTO> findAllCommentsByPostId(String postId) {
+    public List<CommentResponseDTO> findByPostId(String postId) {
+        logger.info("Finding all Comments of post, ID: {}", postId);
         var commentList = commentRepository.findByPostId(postId);
+        logger.info("Post comments successfully found.");
         return commentMapper.toResponseListDTO(commentList);
     }
 
     public CommentResponseDTO update(String commentId, CommentRequestDTO request) {
+        logger.info("Update comment. ID: {}", commentId);
         var comment = commentRepository.findById(commentId).orElseThrow(() -> new ResourceNotFoundException("Comment not found"));
         commentMapper.toUpdateEntity(request, comment);
         var updatedComment = commentRepository.save(comment);
+        logger.info("Comment successfully updated");
         return commentMapper.toResponseDTO(updatedComment);
     }
 
     public void delete(String commentId) {
+        logger.info("Delete comment. ID: {}", commentId);
         var comment = commentRepository.findById(commentId).orElseThrow(() -> new ResourceNotFoundException("Comment not found"));
         commentRepository.delete(comment);
+        logger.info("Comment successfully deleted.");
     }
 }

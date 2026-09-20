@@ -2,10 +2,10 @@ spring:
   application:
     name: blog-api
 
-  jpa:
-    show-sql: true
-  logging:
-    level:
-      org.springframework.data.mongodb.core.MongoTemplate: DEBUG
-    #root: WARN
-    br.com.gs.coursespring: DEBUG
+  profiles:
+    active: local
+
+logging:
+  level:
+    org.springframework.data.mongodb.core.MongoTemplate: DEBUG
+    br.com.gs.blogapi: DEBUG

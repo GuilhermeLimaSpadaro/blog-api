@@ -1,144 +1,168 @@
 # Blog API
 
-API REST para um sistema de blog — usuários, posts e comentários — feita em Java com Spring Boot e persistência em MongoDB.
+API REST para gerenciamento de usuários, posts e comentários, desenvolvida com Java e Spring Boot e persistência em MongoDB.
 
-Comecei esse projeto para sair da teoria e treinar decisões reais de arquitetura backend: modelagem de relacionamentos num banco não relacional, validação de entrada, organização em camadas sem exagerar na complexidade. Ele ainda está em construção, então o código muda com alguma frequência conforme vou revisando decisões antigas.
+O projeto aplica uma arquitetura em camadas e utiliza DTOs para separar o modelo de domínio da representação da API.
 
 ## Tecnologias
 
-- **Java 21**
-- **Spring Boot 4.0.7**
-- **Spring Web**, para expor os endpoints REST
-- **Spring Data MongoDB**, para persistência
-- **Bean Validation** (Jakarta Validation), para validar os DTOs de entrada
-- **MongoDB**
-- **Spring Boot Test** + **Mockito**, para a camada de testes
-- **Maven**
+* Java 21
+* Spring Boot 4.1.1
+* Spring Web
+* Spring Data MongoDB
+* MongoDB
+* Bean Validation / Jakarta Validation
+* MapStruct
+* JUnit 5
+* Mockito
+* Maven
+
+## Funcionalidades
+
+* Criação, consulta, atualização e remoção de usuários
+* Criação, consulta, atualização e remoção de posts
+* Criação, consulta, atualização e remoção de comentários
+* Associação de posts a autores
+* Associação de comentários a autores e posts
+* Validação dos dados de entrada
+* DTOs de request e response
+* Mapeamento entre entidades e DTOs
+* Tratamento global de exceções
+* Testes unitários da camada de serviço
 
 ## Modelo de domínio
 
-- **User**: usuário do blog, com `id`, `name`, `email`, `phone` e `password`. Pode ser autor de posts e comentários.
-- **Post**: publicação com `id`, `date`, `title`, `body` e `authorId`.
-- **Comment**: comentário com `id`, `text`, `date`, `authorId` e `postId`. Possui coleção própria (`comment`), repositório e controller dedicados.
+```text
+User
+ ├── Posts
+ └── Comments
 
-Uma mudança recente: Post e Comment guardavam o autor com `@DBRef`, trazendo o objeto `User` inteiro embutido. Troquei isso por guardar só o `authorId` (e o `postId`, no caso do Comment) como `String`, e resolver esses relacionamentos na camada de serviço — `PostService` e `CommentService` agora pedem os dados do autor para o `UserService` quando precisam. Ficou mais barato nas consultas e evita o risco de vazar dado sensível do usuário (como `password`) sem querer.
+Post
+ ├── authorId
+ └── Comments
 
-Todas as entidades continuam validando seus campos obrigatórios no construtor, lançando `IllegalArgumentException` quando algum valor essencial é `null`.
-
-## Estrutura do projeto
-
+Comment
+ ├── authorId
+ └── postId
 ```
+
+Os relacionamentos de autor e post são representados por IDs. Os DTOs de resposta utilizam `UserDetailsDTO` para retornar somente os dados necessários do autor.
+
+## Estrutura
+
+```text
 src/main/java/com/gspadaro/blogapi
-├── config          # Configuração de carga inicial de dados (perfil "dev")
-├── controller      # Controladores REST (User, Post, Comment)
-├── domain          # Entidades de domínio (documentos MongoDB)
-├── dto             # DTOs de request/response (records)
-├── exception       # Exceções customizadas e tratamento global de erros
-├── mapper          # Conversão entre entidades e DTOs
-├── repository      # Repositórios Spring Data MongoDB
-└── service         # Regras de negócio
+├── controller
+├── dto
+│   ├── comment
+│   ├── post
+│   └── user
+├── exception
+├── mapper
+│   └── custom
+├── model
+├── repository
+└── service
 ```
 
-As DTOs são `records` — as entidades nunca são expostas diretamente pela API. Os DTOs de resposta de post/comentário usam `UserDetailsDTO` (apenas `id` e `name`) para expor o autor sem vazar dados sensíveis como `email`, `phone` ou `password`.
+* `controller` — endpoints REST
+* `service` — regras de negócio
+* `repository` — acesso ao MongoDB
+* `model` — documentos MongoDB (`User`, `Post`, `Comment`)
+* `dto` — objetos de entrada e saída da API
+* `mapper` — conversão entre modelo e DTOs
+* `exception` — exceções e tratamento global
 
-## Validação de entrada
+## Endpoints
 
-Os DTOs de request agora têm Bean Validation:
+### Users
 
-- `UserRequestDTO`: `@NotBlank` em `name` e `phone`, `@Email` no `email`, `@Size(min = 8)` na `password`
-- `PostRequestDTO` e `CommentRequestDTO`: `@NotBlank` nos campos obrigatórios
+| Método | Endpoint             | Descrição           |
+| ------ | -------------------- | ------------------- |
+| POST   | `/api/v1/users`      | Cria um usuário     |
+| GET    | `/api/v1/users/{id}` | Busca um usuário    |
+| PUT    | `/api/v1/users/{id}` | Atualiza um usuário |
+| DELETE | `/api/v1/users/{id}` | Remove um usuário   |
 
-Os controllers acionam essa validação com `@Valid` nos endpoints de criação e atualização.
+### Posts
 
-## Tratamento de exceções
+| Método | Endpoint                      | Descrição                                                  |
+| ------ | ----------------------------- | ---------------------------------------------------------- |
+| POST   | `/api/v1/posts`               | Cria um post                                               |
+| GET    | `/api/v1/posts/{id}`          | Busca um post                                              |
+| GET    | `/api/v1/posts/{id}/comments` | Busca um post com seus comentários                         |
+| GET    | `/api/v1/posts/{id}/author`   | Lista os posts de um autor (`{id}` é o ID do autor)        |
+| PUT    | `/api/v1/posts/{id}`          | Atualiza um post                                           |
+| DELETE | `/api/v1/posts/{id}`          | Remove um post                                             |
 
-O projeto centraliza o tratamento de erros com um `@RestControllerAdvice` (`GlobalHandlerException`), que intercepta:
+### Comments
 
-- `ResourceNotFoundException` → `404 Not Found`
-- `IllegalArgumentException` → `400 Bad Request`
-- `NullPointerException` → `404 Not Found`
+| Método | Endpoint                | Descrição              |
+| ------ | ----------------------- | ---------------------- |
+| POST   | `/api/v1/comments`      | Cria um comentário     |
+| GET    | `/api/v1/comments/{id}` | Busca um comentário    |
+| PUT    | `/api/v1/comments/{id}` | Atualiza um comentário |
+| DELETE | `/api/v1/comments/{id}` | Remove um comentário   |
 
-Em todos os casos, a resposta segue o formato padronizado `StandardError`, contendo:
+## Validação
 
-- Data e hora do erro
-- Status HTTP
-- Descrição do erro
-- Mensagem detalhada
-- Caminho da requisição
+Os DTOs de entrada utilizam Bean Validation.
 
-## Endpoints disponíveis
+* `UserRequestDTO`: nome, e-mail e telefone obrigatórios, e-mail válido e senha com no mínimo 8 caracteres.
+* `PostRequestDTO`: título, corpo e `authorId` obrigatórios.
+* `CommentRequestDTO`: texto, `authorId` e `postId` obrigatórios.
 
-### Usuários (`/users`)
+## Tratamento de erros
 
-| Método | Endpoint       | Descrição                     |
-|--------|----------------|--------------------------------|
-| POST   | `/users`       | Cria um novo usuário           |
-| GET    | `/users`       | Lista todos os usuários        |
-| GET    | `/users/{id}`  | Busca um usuário pelo ID       |
-| PUT    | `/users/{id}`  | Atualiza um usuário existente  |
-| DELETE | `/users/{id}`  | Remove um usuário              |
+O projeto utiliza `@RestControllerAdvice` para centralizar o tratamento de exceções.
 
-### Posts (`/posts`)
+Principais respostas:
 
-| Método | Endpoint              | Descrição                                             |
-|--------|------------------------|--------------------------------------------------------|
-| POST   | `/posts`               | Cria um novo post                                      |
-| GET    | `/posts/{id}`          | Busca um post pelo ID                                  |
-| PUT    | `/posts/{id}`          | Atualiza um post existente                              |
-| DELETE | `/posts/{id}`          | Remove um post                                          |
-| GET    | `/posts/users/{id}`    | Lista os posts publicados por um usuário                |
-| GET    | `/posts/comment/{id}`  | Busca um post pelo ID junto com seus comentários        |
+* `404 Not Found` para recurso inexistente
+* `400 Bad Request` para argumentos inválidos
+* Resposta padronizada com timestamp, status, erro, mensagem e caminho da requisição
 
-### Comentários (`/comments`)
-
-| Método | Endpoint          | Descrição                    |
-|--------|--------------------|-------------------------------|
-| POST   | `/comments`        | Cria um novo comentário       |
-| GET    | `/comments`        | Lista todos os comentários    |
-| PUT    | `/comments/{id}`   | Atualiza um comentário existente |
-| DELETE | `/comments/{id}`   | Remove um comentário          |
-
-## Roadmap
-
-- [x] CRUD de posts e usuários
-- [x] Relacionamento entre posts e autor
-- [x] Tratamento global de exceções
-- [x] CRUD de comentários (endpoints próprios, com autor e post referenciados)
-- [x] Validação de entrada (Bean Validation)
-- [ ] Mais cobertura de testes automatizados
-- [ ] Autenticação e autorização (Spring Security + JWT)
-- [ ] Documentação da API (Swagger/OpenAPI)
-- [ ] Paginação e ordenação nos endpoints de listagem
-- [ ] Deploy
-
-## Executando o projeto
+## Como executar
 
 ### Pré-requisitos
 
-- Java 21
-- Maven (ou o wrapper `./mvnw` incluso no projeto)
-- MongoDB em execução (local ou remoto)
+* Java 21
+* Maven
+* MongoDB em execução em `localhost:27017`
 
-### Configuração
-
-A aplicação sobe com o perfil `dev` ativo por padrão (definido em `application.yml`), que aponta para `mongodb://localhost:27017/blog_db` (arquivo `application-dev.properties`). Ajuste essa URI se o seu MongoDB estiver em outro endereço.
-
-### Rodando a aplicação
+### Executar
 
 ```bash
 ./mvnw spring-boot:run
 ```
 
-A aplicação estará disponível em `http://localhost:8080`.
+A aplicação fica disponível em:
 
-### Dados de teste
+```text
+http://localhost:8080
+```
 
-Com o perfil `dev` ativo por padrão, a classe `Instantiation` roda automaticamente ao iniciar a aplicação: ela limpa as coleções de usuários, posts e comentários e as repopula com dados de exemplo.
-
-## Testes
+### Testes
 
 ```bash
 ./mvnw test
 ```
 
-O projeto conta com testes unitários da camada de serviço usando JUnit 5 e Mockito (ex.: `UserServiceTest`, `PostServiceTest`, `CommentServiceTest`).
+Os testes existentes cobrem principalmente a camada de serviço com JUnit 5 e Mockito.
+
+## Próximos passos
+
+* Aumentar a cobertura de testes
+* Implementar autenticação e autorização com Spring Security/JWT
+* Adicionar documentação OpenAPI/Swagger
+* Implementar paginação e ordenação
+* Realizar deploy
+
+### Correções planejadas
+
+* Corrigir a configuração do MongoDB no `application.yml` (usar `spring.data.mongodb.uri`)
+* Corrigir o handler de `NullPointerException` no tratamento global de exceções
+
+## Autor
+
+**Guilherme Spadaro**
