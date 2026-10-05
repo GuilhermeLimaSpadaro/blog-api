@@ -1,8 +1,8 @@
 package com.gspadaro.blogapi.controller;
 
-import com.gspadaro.blogapi.dto.PostRequestDTO;
-import com.gspadaro.blogapi.dto.PostResponseDTO;
-import com.gspadaro.blogapi.dto.PostWithCommentsDTO;
+import com.gspadaro.blogapi.dto.post.PostRequestDTO;
+import com.gspadaro.blogapi.dto.post.PostResponseDTO;
+import com.gspadaro.blogapi.dto.post.PostWithCommentsDTO;
 import com.gspadaro.blogapi.service.PostService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -12,7 +12,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 import java.util.List;
 
-@RequestMapping(value = "/posts")
+@RequestMapping(value = "/api/v1/posts")
 @RestController
 public class PostController {
 
@@ -29,20 +29,21 @@ public class PostController {
         return ResponseEntity.created(uri).body(post);
     }
 
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<Void> delete(@PathVariable String id) {
+        postService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping(value = "/{id}")
     public ResponseEntity<PostResponseDTO> findById(@PathVariable String id) {
         return ResponseEntity.ok().body(postService.findById(id));
     }
 
-    @GetMapping("users/{id}")
+    @GetMapping(value = "/author/{id}")
     public ResponseEntity<List<PostResponseDTO>> findByAuthorId(@PathVariable String id) {
         List<PostResponseDTO> posts = postService.findByAuthorId(id);
         return ResponseEntity.ok().body(posts);
-    }
-
-    @GetMapping("/comment/{id}")
-    public ResponseEntity<PostWithCommentsDTO> listAllComments(@PathVariable String id) {
-        return ResponseEntity.ok().body(postService.listAllComments(id));
     }
 
     @PutMapping(value = "/{id}")
@@ -50,9 +51,8 @@ public class PostController {
         return ResponseEntity.ok().body(postService.update(id, request));
     }
 
-    @DeleteMapping(value = "/{id}")
-    public ResponseEntity<Void> delete(@PathVariable String id) {
-        postService.delete(id);
-        return ResponseEntity.noContent().build();
+    @GetMapping
+    public ResponseEntity<PostWithCommentsDTO> listAllComments(@PathVariable String id) {
+        return ResponseEntity.ok().body(postService.listAllComments(id));
     }
 }
