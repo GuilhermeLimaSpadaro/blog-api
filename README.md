@@ -121,7 +121,7 @@ Em todos os casos, a resposta segue o formato padronizado `StandardError`, conte
 
 ### Configuração
 
-A aplicação sobe com o perfil `dev` ativo por padrão (definido em `application.properties`), que aponta para `mongodb://localhost:27017/blog_db` (arquivo `application-dev.properties`). Ajuste essa URI se o seu MongoDB estiver em outro endereço.
+A aplicação sobe com o perfil `dev` ativo por padrão (definido em `application.yml`), que aponta para `mongodb://localhost:27017/blog_db` (arquivo `application-dev.properties`). Ajuste essa URI se o seu MongoDB estiver em outro endereço.
 
 ### Rodando a aplicação
 
