@@ -1,4 +1,4 @@
-package com.gspadaro.blogapi.domain;
+package com.gspadaro.blogapi.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -22,8 +22,7 @@ public class User implements Serializable {
     public User() {
     }
 
-    public User(String id, String name, String email, String phone, String password) {
-        this.id = id;
+    public User(String name, String email, String phone, String password) {
         if (name == null) {
             throw new IllegalArgumentException("Name cannot be null");
         }
@@ -42,8 +41,12 @@ public class User implements Serializable {
         this.password = password;
     }
 
-    public User(String name, String email, String phone, String password) {
-        this(null, name, email, phone, password);
+    public User(String id, String name, String email, String phone, String password) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.phone = phone;
+        this.password = password;
     }
 
     public String getId() {

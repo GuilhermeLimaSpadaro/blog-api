@@ -1,4 +1,4 @@
-package com.gspadaro.blogapi.domain;
+package com.gspadaro.blogapi.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -23,8 +23,7 @@ public class Post implements Serializable {
     public Post() {
     }
 
-    public Post(String id, Instant date, String title, String body, String authorId) {
-        this.id = id;
+    public Post(Instant date, String title, String body, String authorId) {
         this.date = date;
         if (title == null) {
             throw new IllegalArgumentException("Title cannot be null");
@@ -40,8 +39,12 @@ public class Post implements Serializable {
         this.authorId = authorId;
     }
 
-    public Post(String title, String body, String author) {
-        this(null, null, title, body, author);
+    public Post(String id, Instant date, String title, String body, String authorId) {
+        this.id = id;
+        this.date = date;
+        this.title = title;
+        this.body = body;
+        this.authorId = authorId;
     }
 
     public String getId() {

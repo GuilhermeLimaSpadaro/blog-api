@@ -1,10 +1,10 @@
 package com.gspadaro.blogapi.service;
 
-import com.gspadaro.blogapi.domain.Post;
-import com.gspadaro.blogapi.dto.CommentResponseDTO;
-import com.gspadaro.blogapi.dto.PostRequestDTO;
-import com.gspadaro.blogapi.dto.PostResponseDTO;
-import com.gspadaro.blogapi.dto.UserDetailsDTO;
+import com.gspadaro.blogapi.model.Post;
+import com.gspadaro.blogapi.dto.comment.CommentResponseDTO;
+import com.gspadaro.blogapi.dto.post.PostRequestDTO;
+import com.gspadaro.blogapi.dto.post.PostResponseDTO;
+import com.gspadaro.blogapi.dto.user.UserDetailsDTO;
 import com.gspadaro.blogapi.exception.ResourceNotFoundException;
 import com.gspadaro.blogapi.repository.PostRepository;
 import org.junit.jupiter.api.BeforeEach;

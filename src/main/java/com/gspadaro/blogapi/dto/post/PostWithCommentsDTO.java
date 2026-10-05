@@ -1,4 +1,6 @@
-package com.gspadaro.blogapi.dto;
+package com.gspadaro.blogapi.dto.post;
+
+import com.gspadaro.blogapi.dto.comment.CommentResponseDTO;
 
 import java.util.List;
 
