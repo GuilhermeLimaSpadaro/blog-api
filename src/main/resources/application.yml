@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: blog-api
+
+  jpa:
+    show-sql: true
+  logging:
+    level:
+      org.springframework.data.mongodb.core.MongoTemplate: DEBUG
+    #root: WARN
+    br.com.gs.coursespring: DEBUG
