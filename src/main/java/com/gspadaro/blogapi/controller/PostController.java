@@ -40,7 +40,7 @@ public class PostController {
         return ResponseEntity.ok().body(postService.findById(id));
     }
 
-    @GetMapping(value = "/author/{id}")
+    @GetMapping(value = "/{id}/author")
     public ResponseEntity<List<PostResponseDTO>> findByAuthorId(@PathVariable String id) {
         List<PostResponseDTO> posts = postService.findByAuthorId(id);
         return ResponseEntity.ok().body(posts);
@@ -51,7 +51,7 @@ public class PostController {
         return ResponseEntity.ok().body(postService.update(id, request));
     }
 
-    @GetMapping
+    @GetMapping(value = "/{id}/comments")
     public ResponseEntity<PostWithCommentsDTO> listAllComments(@PathVariable String id) {
         return ResponseEntity.ok().body(postService.listAllComments(id));
     }
