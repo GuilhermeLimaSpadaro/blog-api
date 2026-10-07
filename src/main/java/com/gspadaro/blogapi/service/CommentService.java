@@ -26,7 +26,7 @@ public class CommentService {
         logger.info("Create comment.");
         var comment = commentMapper.toEntity(request);
         var savedComment = commentRepository.save(comment);
-        logger.info("Comment successfully created. CommentID: {}, PostID: {}, AuthorID: {}", savedComment.getId(), savedComment.getPostId(), savedComment.getAuthorId());
+        logger.info("Comment successfully created. CommentID: {}, PostID: {}, UserID: {}", savedComment.getId(), savedComment.getPostId(), savedComment.getUserId());
         return commentMapper.toResponseDTO(savedComment);
     }
 
