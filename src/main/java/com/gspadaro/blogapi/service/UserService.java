@@ -1,6 +1,5 @@
 package com.gspadaro.blogapi.service;
 
-import com.gspadaro.blogapi.dto.user.UserDetailsDTO;
 import com.gspadaro.blogapi.dto.user.UserRequestDTO;
 import com.gspadaro.blogapi.dto.user.UserResponseDTO;
 import com.gspadaro.blogapi.exception.ResourceNotFoundException;
@@ -34,7 +33,7 @@ public class UserService {
         logger.info("Finding User. ID: {}", userId);
         User user = userRepository.findById(userId).orElseThrow(() -> {
             logger.warn("User not found. ID: {}", userId);
-            return new ResourceNotFoundException("Resource not found");
+            return new ResourceNotFoundException("User not found");
         });
         logger.info("User successfully found.");
         return userMapper.toResponseDTO(user);
@@ -42,7 +41,7 @@ public class UserService {
 
     public UserResponseDTO update(String userId, UserRequestDTO request) {
         logger.info("Update User. ID: {}", userId);
-        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
         userMapper.toUpdateEntity(request, user);
         User updatedUser = userRepository.save(user);
         logger.info("User successfully updated");
@@ -51,7 +50,7 @@ public class UserService {
 
     public void delete(String userId) {
         logger.info("User Delete. ID: {}", userId);
-        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
         userRepository.delete(user);
         logger.info("User successfully deleted.");
     }
