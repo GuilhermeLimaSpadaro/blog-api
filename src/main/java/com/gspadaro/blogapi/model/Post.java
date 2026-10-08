@@ -18,12 +18,12 @@ public class Post implements Serializable {
     private Instant date = Instant.now();
     private String title;
     private String body;
-    private String authorId;
+    private String userId;
 
     public Post() {
     }
 
-    public Post(Instant date, String title, String body, String authorId) {
+    public Post(Instant date, String title, String body, String userId) {
         this.date = date;
         if (title == null) {
             throw new IllegalArgumentException("Title cannot be null");
@@ -33,18 +33,18 @@ public class Post implements Serializable {
             throw new IllegalArgumentException("Body cannot be null");
         }
         this.body = body;
-        if (authorId == null) {
+        if (userId == null) {
             throw new IllegalArgumentException("Author cannot be null");
         }
-        this.authorId = authorId;
+        this.userId = userId;
     }
 
-    public Post(String id, Instant date, String title, String body, String authorId) {
+    public Post(String id, Instant date, String title, String body, String userId) {
         this.id = id;
         this.date = date;
         this.title = title;
         this.body = body;
-        this.authorId = authorId;
+        this.userId = userId;
     }
 
     public String getId() {
@@ -79,12 +79,12 @@ public class Post implements Serializable {
         this.body = body;
     }
 
-    public String getAuthorId() {
-        return authorId;
+    public String getUserId() {
+        return userId;
     }
 
-    public void setAuthorId(String authorId) {
-        this.authorId = authorId;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     @Override
