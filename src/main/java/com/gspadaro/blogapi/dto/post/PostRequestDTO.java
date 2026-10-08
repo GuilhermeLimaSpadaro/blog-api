@@ -4,5 +4,5 @@ import jakarta.validation.constraints.NotBlank;
 
 public record PostRequestDTO(@NotBlank String title,
                              @NotBlank String body,
-                             @NotBlank String authorId) {
+                             @NotBlank String userId) {
 }
