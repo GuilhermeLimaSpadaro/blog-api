@@ -14,9 +14,20 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface PostMapper extends ObjectMapper<Post, PostRequestDTO, PostResponseDTO> {
-    @Mapping(target = "post", source = "post")
-    @Mapping(target = "comment", source = "commentList")
+
+    @Mapping(target = "comments", source = "commentList")
     PostWithCommentsDTO toPostCommentsDTO(PostResponseDTO post, List<CommentResponseDTO> commentList);
+
     @Mapping(target = "id", source = "post.id")
+    @Mapping(target = "user", source = "user")
     PostResponseDTO toResponseDTO(Post post, UserDetailsDTO user);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "date", ignore = true)
+    @Override
+    Post toEntity(PostRequestDTO post);
+
+    @Mapping(target = "user", ignore = true)
+    @Override
+    PostResponseDTO toResponseDTO(Post post);
 }
