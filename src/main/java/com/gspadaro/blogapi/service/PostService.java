@@ -33,9 +33,9 @@ public class PostService {
     public PostResponseDTO create(PostRequestDTO request) {
         logger.info("Create Post");
         var post = postMapper.toEntity(request);
-        var user = userService.findById(post.getAuthorId());
+        var user = userService.findById(post.getUserId());
         var savedPost = postRepository.save(post);
-        logger.info("Post successfully created. ID: {}", post.getId());
+        logger.info("Post successfully created. PostID: {}, AuthorID: {}", post.getId(), user.id());
         return postMapper.toResponseDTO(savedPost, userMapper.toDetailsDTO(user));
     }
 
@@ -46,24 +46,24 @@ public class PostService {
             return new ResourceNotFoundException("Post not found");
         });
         logger.info("Post successfully found.");
-        var user = userService.findById(post.getAuthorId());
+        var user = userService.findById(post.getUserId());
         return postMapper.toResponseDTO(post, userMapper.toDetailsDTO(user));
     }
 
     //Buscar post através do id do Usuário.
-    public List<PostResponseDTO> findByAuthorId(String authorId) {
-        logger.info("Finding Post by author id. ID: {}", authorId);
-        var user = userService.findById(authorId);
-        var postList = postRepository.findByAuthorId(authorId);
-        logger.info("Posts linked to this author found.");
+    public List<PostResponseDTO> findByUserId(String userId) {
+        logger.info("Finding Post by user id. ID: {}", userId);
+        var user = userService.findById(userId);
+        var postList = postRepository.findByUserId(user.id());
+        logger.info("Post successfully found with user id.");
         return postList.stream().map(post -> postMapper.toResponseDTO(post, userMapper.toDetailsDTO(user))).toList();
     }
 
     //Buscar Post e os comentarios
-    public PostWithCommentsDTO listAllComments(String postId) {
+    public PostWithCommentsDTO findWithComments(String postId) {
         logger.info("List all comments on a post. ID: {}", postId);
         var post = postRepository.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post not found"));
-        var user = userService.findById(post.getAuthorId());
+        var user = userService.findById(post.getUserId());
         var commentsList = commentService.findByPostId(postId);
         logger.info("The post and its comments were successfully found.");
         return postMapper.toPostCommentsDTO(postMapper.toResponseDTO(post, userMapper.toDetailsDTO(user)), commentsList);
@@ -72,7 +72,7 @@ public class PostService {
     public PostResponseDTO update(String postId, PostRequestDTO request) {
         logger.info("Update Post. ID: {}", postId);
         var post = postRepository.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post not found"));
-        var user = userService.findById(post.getAuthorId());
+        var user = userService.findById(post.getUserId());
         postMapper.toUpdateEntity(request, post);
         var updatedPost = postRepository.save(post);
         logger.info("Post successfully updated.");
