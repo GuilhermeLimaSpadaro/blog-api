@@ -2,46 +2,10 @@ package com.gspadaro.blogapi.exception;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-import java.io.Serial;
 import java.io.Serializable;
 import java.time.Instant;
 
-public class StandardError implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 1L;
-
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "UTC")
-    private final Instant timeStamp;
-    private final Integer status;
-    private final String error;
-    private final String message;
-    private final String path;
-
-    public StandardError(Instant timeStamp, Integer status, String error, String message, String path) {
-        this.timeStamp = timeStamp;
-        this.status = status;
-        this.error = error;
-        this.message = message;
-        this.path = path;
-    }
-
-    public Instant getTimeStamp() {
-        return timeStamp;
-    }
-
-    public Integer getStatus() {
-        return status;
-    }
-
-    public String getError() {
-        return error;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public String getPath() {
-        return path;
-    }
+public record StandardError(
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "UTC") Instant timeStamp,
+        Integer status, String error, String message, String path) implements Serializable {
 }

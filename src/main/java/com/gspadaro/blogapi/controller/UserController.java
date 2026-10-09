@@ -1,6 +1,5 @@
 package com.gspadaro.blogapi.controller;
 
-import com.gspadaro.blogapi.dto.post.PostResponseDTO;
 import com.gspadaro.blogapi.dto.user.UserRequestDTO;
 import com.gspadaro.blogapi.dto.user.UserResponseDTO;
 import com.gspadaro.blogapi.service.UserService;
@@ -10,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.List;
 
 @RequestMapping(value = "/api/v1/users")
 @RestController

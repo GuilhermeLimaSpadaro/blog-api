@@ -11,7 +11,7 @@ public interface ObjectMapper<E, Q, R> {
 
     R toResponseDTO(E entity);
 
-    void toUpdateEntity(Q request, E entity);
+    void toUpdateEntity(Q request, @MappingTarget E entity);
 
     List<R> toResponseListDTO(List<E> response);
 }
