@@ -1,8 +1,7 @@
 # Blog API
 
-API REST para gerenciamento de usuários, posts e comentários, desenvolvida com Java e Spring Boot e persistência em MongoDB.
-
-O projeto aplica uma arquitetura em camadas e utiliza DTOs para separar o modelo de domínio da representação da API.
+API REST de blog para gerenciar usuários, posts e comentários, desenvolvida com Java e Spring Boot e persistência em
+MongoDB.
 
 ## Tecnologias
 
@@ -19,16 +18,19 @@ O projeto aplica uma arquitetura em camadas e utiliza DTOs para separar o modelo
 
 ## Funcionalidades
 
-* Criação, consulta, atualização e remoção de usuários
-* Criação, consulta, atualização e remoção de posts
-* Criação, consulta, atualização e remoção de comentários
-* Associação de posts a autores
-* Associação de comentários a autores e posts
+* Cadastro, consulta, atualização e remoção de usuários
+* Cadastro, consulta, atualização e remoção de posts
+* Cadastro, consulta, atualização e remoção de comentários
+* Posts vinculados ao usuário autor
+* Comentários vinculados ao usuário autor e ao post comentado
+* Consulta de um post junto com todos os seus comentários
+* Listagem dos posts de um usuário
+* Verificação de que o usuário e o post existem ao criar ou atualizar um comentário
 * Validação dos dados de entrada
-* DTOs de request e response
-* Mapeamento entre entidades e DTOs
-* Tratamento global de exceções
-* Testes unitários da camada de serviço
+* Respostas de erro padronizadas
+* Dados sensíveis protegidos: a senha do usuário nunca é retornada pela API
+* Logs das principais operações
+* Testes unitários dos serviços
 
 ## Modelo de domínio
 
@@ -38,20 +40,20 @@ User
  └── Comments
 
 Post
- ├── authorId
+ ├── userId
  └── Comments
 
 Comment
- ├── authorId
+ ├── userId
  └── postId
 ```
 
-Os relacionamentos de autor e post são representados por IDs. Os DTOs de resposta utilizam `UserDetailsDTO` para retornar somente os dados necessários do autor.
+Os relacionamentos são guardados por IDs (`userId` e `postId`). Nas respostas, o post traz o `id` e o `name` do autor.
 
 ## Estrutura
 
 ```text
-src/main/java/com/gspadaro/blogapi
+src/main/java/br/com/gspadaro/blogapi
 ├── controller
 ├── dto
 │   ├── comment
@@ -65,20 +67,12 @@ src/main/java/com/gspadaro/blogapi
 └── service
 ```
 
-* `controller` — endpoints REST
-* `service` — regras de negócio
-* `repository` — acesso ao MongoDB
-* `model` — documentos MongoDB (`User`, `Post`, `Comment`)
-* `dto` — objetos de entrada e saída da API
-* `mapper` — conversão entre modelo e DTOs
-* `exception` — exceções e tratamento global
-
 ## Endpoints
 
 ### Users
 
 | Método | Endpoint             | Descrição           |
-| ------ | -------------------- | ------------------- |
+|--------|----------------------|---------------------|
 | POST   | `/api/v1/users`      | Cria um usuário     |
 | GET    | `/api/v1/users/{id}` | Busca um usuário    |
 | PUT    | `/api/v1/users/{id}` | Atualiza um usuário |
@@ -86,19 +80,19 @@ src/main/java/com/gspadaro/blogapi
 
 ### Posts
 
-| Método | Endpoint                      | Descrição                                                  |
-| ------ | ----------------------------- | ---------------------------------------------------------- |
-| POST   | `/api/v1/posts`               | Cria um post                                               |
-| GET    | `/api/v1/posts/{id}`          | Busca um post                                              |
-| GET    | `/api/v1/posts/{id}/comments` | Busca um post com seus comentários                         |
-| GET    | `/api/v1/posts/{id}/author`   | Lista os posts de um autor (`{id}` é o ID do autor)        |
-| PUT    | `/api/v1/posts/{id}`          | Atualiza um post                                           |
-| DELETE | `/api/v1/posts/{id}`          | Remove um post                                             |
+| Método | Endpoint                      | Descrição                                               |
+|--------|-------------------------------|---------------------------------------------------------|
+| POST   | `/api/v1/posts`               | Cria um post                                            |
+| GET    | `/api/v1/posts/{id}`          | Busca um post                                           |
+| GET    | `/api/v1/posts/{id}/comments` | Busca um post com seus comentários                      |
+| GET    | `/api/v1/posts/users/{id}`    | Lista os posts de um usuário (`{id}` é o ID do usuário) |
+| PUT    | `/api/v1/posts/{id}`          | Atualiza um post                                        |
+| DELETE | `/api/v1/posts/{id}`          | Remove um post                                          |
 
 ### Comments
 
 | Método | Endpoint                | Descrição              |
-| ------ | ----------------------- | ---------------------- |
+|--------|-------------------------|------------------------|
 | POST   | `/api/v1/comments`      | Cria um comentário     |
 | GET    | `/api/v1/comments/{id}` | Busca um comentário    |
 | PUT    | `/api/v1/comments/{id}` | Atualiza um comentário |
@@ -106,20 +100,21 @@ src/main/java/com/gspadaro/blogapi
 
 ## Validação
 
-Os DTOs de entrada utilizam Bean Validation.
+Os dados de entrada são validados com Bean Validation.
 
-* `UserRequestDTO`: nome, e-mail e telefone obrigatórios, e-mail válido e senha com no mínimo 8 caracteres.
-* `PostRequestDTO`: título, corpo e `authorId` obrigatórios.
-* `CommentRequestDTO`: texto, `authorId` e `postId` obrigatórios.
+* Usuário: nome, e-mail, telefone e senha obrigatórios; e-mail válido e senha com no mínimo 8 caracteres.
+* Post: título, corpo e `userId` obrigatórios.
+* Comentário: texto, `userId` e `postId` obrigatórios. O usuário e o post informados precisam existir.
 
 ## Tratamento de erros
 
-O projeto utiliza `@RestControllerAdvice` para centralizar o tratamento de exceções.
+As exceções são tratadas de forma centralizada com `@RestControllerAdvice`.
 
 Principais respostas:
 
-* `404 Not Found` para recurso inexistente
+* `404 Not Found` para recurso inexistente (usuário, post ou comentário)
 * `400 Bad Request` para argumentos inválidos
+* `500 Internal Server Error` para `NullPointerException`
 * Resposta padronizada com timestamp, status, erro, mensagem e caminho da requisição
 
 ## Como executar
@@ -129,6 +124,23 @@ Principais respostas:
 * Java 21
 * Maven
 * MongoDB em execução em `localhost:27017`
+
+### Configuração
+
+O perfil `local` vem ativo por padrão (`application-local.yml`) e conecta em `mongodb://localhost:27017/blog_db`. As
+credenciais são lidas de variáveis de ambiente:
+
+```bash
+export MONGODB_USERNAME=seu_usuario
+export MONGODB_PASSWORD=sua_senha
+```
+
+No Windows (PowerShell):
+
+```powershell
+$env:MONGODB_USERNAME="seu_usuario"
+$env:MONGODB_PASSWORD="sua_senha"
+```
 
 ### Executar
 
@@ -148,7 +160,9 @@ http://localhost:8080
 ./mvnw test
 ```
 
-Os testes existentes cobrem principalmente a camada de serviço com JUnit 5 e Mockito.
+Os testes unitários cobrem a camada de serviço (`UserService`, `PostService`, `PostQueryService` e `CommentService`) com
+JUnit 5 e Mockito, usando os mappers reais. O teste `contextLoads` sobe a aplicação completa e precisa do MongoDB
+disponível.
 
 ## Próximos passos
 
@@ -157,11 +171,6 @@ Os testes existentes cobrem principalmente a camada de serviço com JUnit 5 e Mo
 * Adicionar documentação OpenAPI/Swagger
 * Implementar paginação e ordenação
 * Realizar deploy
-
-### Correções planejadas
-
-* Corrigir a configuração do MongoDB no `application.yml` (usar `spring.data.mongodb.uri`)
-* Corrigir o handler de `NullPointerException` no tratamento global de exceções
 
 ## Autor
 
