@@ -1,22 +1,20 @@
-package com.gspadaro.blogapi.service;
+package br.com.gspadaro.blogapi.service;
 
-import com.gspadaro.blogapi.dto.comment.CommentRequestDTO;
-import com.gspadaro.blogapi.exception.ResourceNotFoundException;
-import com.gspadaro.blogapi.mapper.custom.CommentMapper;
-import com.gspadaro.blogapi.model.Comment;
-import com.gspadaro.blogapi.model.Post;
-import com.gspadaro.blogapi.model.User;
-import com.gspadaro.blogapi.repository.CommentRepository;
+import br.com.gspadaro.blogapi.dto.comment.CommentRequestDTO;
+import br.com.gspadaro.blogapi.dto.post.PostResponseDTO;
+import br.com.gspadaro.blogapi.dto.user.UserResponseDTO;
+import br.com.gspadaro.blogapi.exception.ResourceNotFoundException;
+import br.com.gspadaro.blogapi.mapper.custom.CommentMapper;
+import br.com.gspadaro.blogapi.mapper.custom.PostMapper;
+import br.com.gspadaro.blogapi.mapper.custom.UserMapper;
+import br.com.gspadaro.blogapi.model.Comment;
+import br.com.gspadaro.blogapi.repository.CommentRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Spy;
+import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Instant;
@@ -32,27 +30,40 @@ import static org.mockito.Mockito.*;
 class CommentServiceTest {
     @Mock
     private CommentRepository commentRepository;
+    @Mock
+    private UserService userService;
+    @Mock
+    private PostService postService;
     @InjectMocks
     private CommentService commentService;
     @Captor
     private ArgumentCaptor<Comment> captor;
-    private Comment savedComment;
-    private CommentRequestDTO commentRequest;
+    @Spy
+    private PostMapper postMapper = Mappers.getMapper(PostMapper.class);
+    @Spy
+    private UserMapper userMapper = Mappers.getMapper(UserMapper.class);
     @Spy
     private CommentMapper commentMapper = Mappers.getMapper(CommentMapper.class);
 
+    private UserResponseDTO savedUser;
+    private PostResponseDTO savedPost;
+    private Comment savedComment;
+    private CommentRequestDTO commentRequest;
+
     @BeforeEach
     void setUp() {
-        User savedUser = new User(UUID.randomUUID().toString(), "Guilherme", "guilhermespadaro@gmail.com", "11955447766", "13ABC234");
-        Post savedPost = new Post(UUID.randomUUID().toString(), Instant.now(), "Bom dia!", "Como o dia está lindo hoje!", savedUser.getId());
-        savedComment = new Comment(UUID.randomUUID().toString(), "Andar de skate é demais!", Instant.now(), savedUser.getId(), savedPost.getId());
-        commentRequest = new CommentRequestDTO("Que cachorro lindo!", savedUser.getId(), savedPost.getId());
+        savedUser = new UserResponseDTO(UUID.randomUUID().toString(), "Guilherme", "guilhermespadaro@gmail.com", "11955447766");
+        savedPost = new PostResponseDTO(UUID.randomUUID().toString(), Instant.now(), "Bom dia!", "Como o dia está lindo hoje!", userMapper.toDetailsDTO(savedUser));
+        savedComment = new Comment(UUID.randomUUID().toString(), "Andar de skate é demais!", Instant.now(), savedUser.id(), savedPost.id());
+        commentRequest = new CommentRequestDTO("Que cachorro lindo!", savedUser.id(), savedPost.id());
     }
 
     @Test
     @DisplayName("Should create a comment successfully.")
     void shouldCreateComment() {
         //Arrange
+        when(userService.findById(commentRequest.userId())).thenReturn(savedUser);
+        when(postService.findById(commentRequest.postId())).thenReturn(savedPost);
         when(commentRepository.save(any(Comment.class))).thenReturn(savedComment);
         //Act
         var result = commentService.create(commentRequest);

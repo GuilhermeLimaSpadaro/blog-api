@@ -1,4 +1,4 @@
-package com.gspadaro.blogapi;
+package br.com.gspadaro.blogapi;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

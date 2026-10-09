@@ -1,10 +1,10 @@
-package com.gspadaro.blogapi.service;
+package br.com.gspadaro.blogapi.service;
 
-import com.gspadaro.blogapi.mapper.custom.UserMapper;
-import com.gspadaro.blogapi.model.User;
-import com.gspadaro.blogapi.dto.user.UserRequestDTO;
-import com.gspadaro.blogapi.exception.ResourceNotFoundException;
-import com.gspadaro.blogapi.repository.UserRepository;
+import br.com.gspadaro.blogapi.mapper.custom.UserMapper;
+import br.com.gspadaro.blogapi.model.User;
+import br.com.gspadaro.blogapi.dto.user.UserRequestDTO;
+import br.com.gspadaro.blogapi.exception.ResourceNotFoundException;
+import br.com.gspadaro.blogapi.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,17 +29,15 @@ class UserServiceTest {
 
     @Mock
     private UserRepository userRepository;
-
     @InjectMocks
     private UserService userService;
-
     @Captor
     private ArgumentCaptor<User> captor;
+    @Spy
+    private UserMapper userMapper = Mappers.getMapper(UserMapper.class);
 
     private User savedUser;
     private UserRequestDTO requestUser;
-    @Spy
-    private UserMapper userMapper = Mappers.getMapper(UserMapper.class);
 
     @BeforeEach
     void setUp() {
