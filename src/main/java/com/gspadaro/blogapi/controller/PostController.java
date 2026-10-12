@@ -29,21 +29,20 @@ public class PostController {
         return ResponseEntity.created(uri).body(post);
     }
 
-    @DeleteMapping(value = "/{id}")
-    public ResponseEntity<Void> delete(@PathVariable String id) {
-        postService.delete(id);
-        return ResponseEntity.noContent().build();
-    }
-
     @GetMapping(value = "/{id}")
     public ResponseEntity<PostResponseDTO> findById(@PathVariable String id) {
         return ResponseEntity.ok().body(postService.findById(id));
     }
 
-    @GetMapping(value = "/{id}/author")
-    public ResponseEntity<List<PostResponseDTO>> findByAuthorId(@PathVariable String id) {
-        List<PostResponseDTO> posts = postService.findByAuthorId(id);
+    @GetMapping(value = "/users/{id}")
+    public ResponseEntity<List<PostResponseDTO>> findByUserId(@PathVariable String id) {
+        List<PostResponseDTO> posts = postService.findByUserId(id);
         return ResponseEntity.ok().body(posts);
+    }
+
+    @GetMapping(value = "/{id}/comments")
+    public ResponseEntity<PostWithCommentsDTO> findWithComments(@PathVariable String id) {
+        return ResponseEntity.ok().body(postService.findWithComments(id));
     }
 
     @PutMapping(value = "/{id}")
@@ -51,8 +50,9 @@ public class PostController {
         return ResponseEntity.ok().body(postService.update(id, request));
     }
 
-    @GetMapping(value = "/{id}/comments")
-    public ResponseEntity<PostWithCommentsDTO> listAllComments(@PathVariable String id) {
-        return ResponseEntity.ok().body(postService.listAllComments(id));
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<Void> delete(@PathVariable String id) {
+        postService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }
