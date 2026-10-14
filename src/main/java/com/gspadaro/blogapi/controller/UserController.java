@@ -1,6 +1,6 @@
 package com.gspadaro.blogapi.controller;
 
-import com.gspadaro.blogapi.dto.user.UserDetailsDTO;
+import com.gspadaro.blogapi.dto.post.PostResponseDTO;
 import com.gspadaro.blogapi.dto.user.UserRequestDTO;
 import com.gspadaro.blogapi.dto.user.UserResponseDTO;
 import com.gspadaro.blogapi.service.UserService;
@@ -16,38 +16,33 @@ import java.util.List;
 @RestController
 public class UserController {
 
-    private final UserService service;
+    private final UserService userService;
 
-    public UserController(UserService service) {
-        this.service = service;
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
     @PostMapping
-    public ResponseEntity<UserDetailsDTO> create(@RequestBody @Valid UserRequestDTO userRequest) {
-        UserDetailsDTO user = service.create(userRequest);
+    public ResponseEntity<UserResponseDTO> create(@RequestBody @Valid UserRequestDTO userRequest) {
+        UserResponseDTO user = userService.create(userRequest);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(user.id()).toUri();
         return ResponseEntity.created(uri).body(user);
     }
 
-    @DeleteMapping(value = "/{id}")
-    public ResponseEntity<Void> delete(@PathVariable String id) {
-        service.delete(id);
-        return ResponseEntity.noContent().build();
+    @GetMapping(value = "/{id}")
+    public ResponseEntity<UserResponseDTO> findById(@PathVariable String id) {
+        UserResponseDTO user = userService.findById(id);
+        return ResponseEntity.ok().body(user);
     }
 
     @PutMapping(value = "/{id}")
     public ResponseEntity<UserResponseDTO> update(@PathVariable String id, @RequestBody @Valid UserRequestDTO user) {
-        return ResponseEntity.ok().body(service.update(id, user));
+        return ResponseEntity.ok().body(userService.update(id, user));
     }
 
-    @GetMapping(value = "/{id}")
-    public ResponseEntity<UserResponseDTO> findById(@PathVariable String id) {
-        UserResponseDTO user = service.findById(id);
-        return ResponseEntity.ok().body(user);
-    }
-
-    @GetMapping
-    public ResponseEntity<List<UserResponseDTO>> findAll() {
-        return ResponseEntity.ok().body(service.findAll());
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<Void> delete(@PathVariable String id) {
+        userService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }
