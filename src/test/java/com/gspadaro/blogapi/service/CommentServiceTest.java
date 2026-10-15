@@ -1,10 +1,10 @@
 package com.gspadaro.blogapi.service;
 
+import com.gspadaro.blogapi.dto.comment.CommentRequestDTO;
+import com.gspadaro.blogapi.exception.ResourceNotFoundException;
 import com.gspadaro.blogapi.model.Comment;
 import com.gspadaro.blogapi.model.Post;
 import com.gspadaro.blogapi.model.User;
-import com.gspadaro.blogapi.dto.comment.CommentRequestDTO;
-import com.gspadaro.blogapi.exception.ResourceNotFoundException;
 import com.gspadaro.blogapi.repository.CommentRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -33,17 +33,14 @@ class CommentServiceTest {
     private CommentService commentService;
     @Captor
     private ArgumentCaptor<Comment> captor;
-
-    private User savedUser;
-    private Post savedPost;
     private Comment savedComment;
     private CommentRequestDTO commentRequest;
 
     @BeforeEach
     void setUp() {
-        savedUser = new User(UUID.randomUUID().toString(), "Guilherme", "guilhermespadaro@gmail.com", "11955447766", "13ABC234");
-        savedPost = new Post(UUID.randomUUID().toString(), Instant.now(), "Bom dia!", "Como o dia está lindo hoje!", savedUser.getId());
-        savedComment = new Comment(UUID.randomUUID().toString(), "Andar de skate é demais!", savedUser.getId(), savedPost.getId());
+        User savedUser = new User(UUID.randomUUID().toString(), "Guilherme", "guilhermespadaro@gmail.com", "11955447766", "13ABC234");
+        Post savedPost = new Post(UUID.randomUUID().toString(), Instant.now(), "Bom dia!", "Como o dia está lindo hoje!", savedUser.getId());
+        savedComment = new Comment(UUID.randomUUID().toString(), "Andar de skate é demais!", Instant.now(), savedUser.getId(), savedPost.getId());
         commentRequest = new CommentRequestDTO("Que cachorro lindo!", savedUser.getId(), savedPost.getId());
     }
 
@@ -61,10 +58,10 @@ class CommentServiceTest {
         assertEquals(savedComment.getId(), result.id());
         assertEquals(savedComment.getText(), result.text());
         assertEquals(savedComment.getDate(), result.date());
-        assertEquals(savedComment.getAuthorId(), result.authorId());
+        assertEquals(savedComment.getUserId(), result.userId());
         assertEquals(savedComment.getPostId(), result.postId());
         assertEquals(commentRequest.text(), commentCaptor.getText());
-        assertEquals(commentRequest.authorId(), commentCaptor.getAuthorId());
+        assertEquals(commentRequest.userId(), commentCaptor.getUserId());
         assertEquals(commentRequest.postId(), commentCaptor.getPostId());
     }
 
@@ -81,7 +78,7 @@ class CommentServiceTest {
         assertEquals(savedComment.getId(), result.id());
         assertEquals(savedComment.getText(), result.text());
         assertEquals(savedComment.getDate(), result.date());
-        assertEquals(savedComment.getAuthorId(), result.authorId());
+        assertEquals(savedComment.getUserId(), result.userId());
         assertEquals(savedComment.getPostId(), result.postId());
     }
 
@@ -110,10 +107,10 @@ class CommentServiceTest {
         assertEquals(savedComment.getId(), result.id());
         assertEquals(savedComment.getText(), result.text());
         assertEquals(savedComment.getDate(), result.date());
-        assertEquals(savedComment.getAuthorId(), result.authorId());
+        assertEquals(savedComment.getUserId(), result.userId());
         assertEquals(savedComment.getPostId(), result.postId());
         assertEquals(commentRequest.text(), commentCaptor.getText());
-        assertEquals(commentRequest.authorId(), commentCaptor.getAuthorId());
+        assertEquals(commentRequest.userId(), commentCaptor.getUserId());
         assertEquals(commentRequest.postId(), commentCaptor.getPostId());
     }
 
