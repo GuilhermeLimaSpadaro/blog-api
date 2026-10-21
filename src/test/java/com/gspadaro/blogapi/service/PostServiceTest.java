@@ -1,21 +1,24 @@
 package com.gspadaro.blogapi.service;
 
-import com.gspadaro.blogapi.dto.user.UserResponseDTO;
-import com.gspadaro.blogapi.model.Post;
 import com.gspadaro.blogapi.dto.comment.CommentResponseDTO;
 import com.gspadaro.blogapi.dto.post.PostRequestDTO;
 import com.gspadaro.blogapi.dto.post.PostResponseDTO;
-import com.gspadaro.blogapi.dto.user.UserDetailsDTO;
+import com.gspadaro.blogapi.dto.user.UserResponseDTO;
 import com.gspadaro.blogapi.exception.ResourceNotFoundException;
+import com.gspadaro.blogapi.mapper.custom.PostMapper;
+import com.gspadaro.blogapi.mapper.custom.UserMapper;
+import com.gspadaro.blogapi.model.Post;
 import com.gspadaro.blogapi.repository.PostRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mapstruct.factory.Mappers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Instant;
@@ -44,6 +47,10 @@ class PostServiceTest {
     private UserResponseDTO userDetails;
     private Post savedPost;
     private PostRequestDTO postRequest;
+    @Spy
+    private PostMapper postMapper = Mappers.getMapper(PostMapper.class);
+    @Spy
+    private UserMapper userMapper = Mappers.getMapper(UserMapper.class);
 
     @BeforeEach
     void setUp() {
@@ -79,9 +86,10 @@ class PostServiceTest {
     @DisplayName("Should throw exception if user not found in create post")
     void shouldThrowExceptionIfUserNotFound() {
         //Arrange
-        when(userService.findById(userDetails.id())).thenReturn(userDetails);
+        when(userService.findById(postRequest.userId())).thenThrow(new ResourceNotFoundException("User not found"));
         //Act & Assert
-        assertThrows(NullPointerException.class, () -> postService.create(postRequest));
+        assertThrows(ResourceNotFoundException.class, () -> postService.create(postRequest));
+        verify(postRepository, never()).save(any(Post.class));
     }
 
     @Test

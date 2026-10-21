@@ -2,6 +2,7 @@ package com.gspadaro.blogapi.service;
 
 import com.gspadaro.blogapi.dto.comment.CommentRequestDTO;
 import com.gspadaro.blogapi.exception.ResourceNotFoundException;
+import com.gspadaro.blogapi.mapper.custom.CommentMapper;
 import com.gspadaro.blogapi.model.Comment;
 import com.gspadaro.blogapi.model.Post;
 import com.gspadaro.blogapi.model.User;
@@ -10,10 +11,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mapstruct.factory.Mappers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Instant;
@@ -35,6 +38,8 @@ class CommentServiceTest {
     private ArgumentCaptor<Comment> captor;
     private Comment savedComment;
     private CommentRequestDTO commentRequest;
+    @Spy
+    private CommentMapper commentMapper = Mappers.getMapper(CommentMapper.class);
 
     @BeforeEach
     void setUp() {

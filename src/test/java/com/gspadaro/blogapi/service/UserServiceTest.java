@@ -1,5 +1,6 @@
 package com.gspadaro.blogapi.service;
 
+import com.gspadaro.blogapi.mapper.custom.UserMapper;
 import com.gspadaro.blogapi.model.User;
 import com.gspadaro.blogapi.dto.user.UserRequestDTO;
 import com.gspadaro.blogapi.exception.ResourceNotFoundException;
@@ -8,11 +9,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mapstruct.factory.Mappers;
+
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.Spy;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -34,6 +38,8 @@ class UserServiceTest {
 
     private User savedUser;
     private UserRequestDTO requestUser;
+    @Spy
+    private UserMapper userMapper = Mappers.getMapper(UserMapper.class);
 
     @BeforeEach
     void setUp() {
