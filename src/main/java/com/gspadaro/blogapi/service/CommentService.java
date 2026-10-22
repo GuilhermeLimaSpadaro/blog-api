@@ -15,18 +15,24 @@ import java.util.List;
 public class CommentService {
     private final CommentRepository commentRepository;
     private final CommentMapper commentMapper;
+    private final UserService userService;
+    private final PostService postService;
     private static final Logger logger = LoggerFactory.getLogger(CommentService.class);
 
-    public CommentService(CommentRepository commentRepository, CommentMapper commentMapper) {
+    public CommentService(CommentRepository commentRepository, CommentMapper commentMapper, UserService userService, PostService postService) {
         this.commentRepository = commentRepository;
         this.commentMapper = commentMapper;
+        this.userService = userService;
+        this.postService = postService;
     }
 
     public CommentResponseDTO create(CommentRequestDTO request) {
         logger.info("Create comment.");
+        userService.findById(request.userId());
+        postService.findById(request.postId());
         var comment = commentMapper.toEntity(request);
         var savedComment = commentRepository.save(comment);
-        logger.info("Comment successfully created. CommentID: {}, PostID: {}, UserID: {}", savedComment.getId(), savedComment.getPostId(), savedComment.getUserId());
+        logger.info("Comment successfully created. CommentID: {}, PostID: {}, UserID: {}", savedComment.getId(), request.postId(), request.userId());
         return commentMapper.toResponseDTO(savedComment);
     }
 
@@ -50,6 +56,8 @@ public class CommentService {
     public CommentResponseDTO update(String commentId, CommentRequestDTO request) {
         logger.info("Update comment. ID: {}", commentId);
         var comment = commentRepository.findById(commentId).orElseThrow(() -> new ResourceNotFoundException("Comment not found"));
+        userService.findById(request.userId());
+        postService.findById(request.postId());
         commentMapper.toUpdateEntity(request, comment);
         var updatedComment = commentRepository.save(comment);
         logger.info("Comment successfully updated");

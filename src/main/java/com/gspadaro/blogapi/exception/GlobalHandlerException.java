@@ -28,9 +28,9 @@ public class GlobalHandlerException {
     }
 
     @ExceptionHandler(NullPointerException.class)
-    public ResponseEntity<StandardError> nullPointerException(ResourceNotFoundException e, HttpServletRequest request) {
+    public ResponseEntity<StandardError> nullPointerException(NullPointerException e, HttpServletRequest request) {
         String error = "Null pointer exception";
-        HttpStatus status = HttpStatus.NOT_FOUND;
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
         StandardError standardError = new StandardError(Instant.now(), status.value(), error, e.getMessage(), request.getRequestURI());
         return ResponseEntity.status(status).body(standardError);
     }
