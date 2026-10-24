@@ -1,0 +1,37 @@
+package br.com.gspadaro.blogapi.exception;
+
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.time.Instant;
+
+@RestControllerAdvice
+public class GlobalHandlerException {
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<StandardError> resourceNotFound(ResourceNotFoundException e, HttpServletRequest request) {
+        String error = "Resource not found";
+        HttpStatus status = HttpStatus.NOT_FOUND;
+        StandardError standardError = new StandardError(Instant.now(), status.value(), error, e.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(status).body(standardError);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<StandardError> illegalArgumentException(IllegalArgumentException e, HttpServletRequest request) {
+        String error = "Illegal argument";
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        StandardError standardError = new StandardError(Instant.now(), status.value(), error, e.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(status).body(standardError);
+    }
+
+    @ExceptionHandler(NullPointerException.class)
+    public ResponseEntity<StandardError> nullPointerException(NullPointerException e, HttpServletRequest request) {
+        String error = "Null pointer exception";
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        StandardError standardError = new StandardError(Instant.now(), status.value(), error, e.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(status).body(standardError);
+    }
+}
