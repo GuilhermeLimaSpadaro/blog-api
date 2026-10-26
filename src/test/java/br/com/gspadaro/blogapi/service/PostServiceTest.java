@@ -1,14 +1,14 @@
-package com.gspadaro.blogapi.service;
+package br.com.gspadaro.blogapi.service;
 
-import com.gspadaro.blogapi.dto.comment.CommentResponseDTO;
-import com.gspadaro.blogapi.dto.post.PostRequestDTO;
-import com.gspadaro.blogapi.dto.post.PostResponseDTO;
-import com.gspadaro.blogapi.dto.user.UserResponseDTO;
-import com.gspadaro.blogapi.exception.ResourceNotFoundException;
-import com.gspadaro.blogapi.mapper.custom.PostMapper;
-import com.gspadaro.blogapi.mapper.custom.UserMapper;
-import com.gspadaro.blogapi.model.Post;
-import com.gspadaro.blogapi.repository.PostRepository;
+import br.com.gspadaro.blogapi.dto.comment.CommentResponseDTO;
+import br.com.gspadaro.blogapi.dto.post.PostRequestDTO;
+import br.com.gspadaro.blogapi.dto.post.PostResponseDTO;
+import br.com.gspadaro.blogapi.dto.user.UserResponseDTO;
+import br.com.gspadaro.blogapi.exception.ResourceNotFoundException;
+import br.com.gspadaro.blogapi.mapper.custom.PostMapper;
+import br.com.gspadaro.blogapi.mapper.custom.UserMapper;
+import br.com.gspadaro.blogapi.model.Post;
+import br.com.gspadaro.blogapi.repository.PostRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -37,20 +37,18 @@ class PostServiceTest {
     private PostRepository postRepository;
     @Mock
     private UserService userService;
-    @Mock
-    private CommentService commentService;
     @InjectMocks
     private PostService postService;
     @Captor
     private ArgumentCaptor<Post> captor;
-
-    private UserResponseDTO userDetails;
-    private Post savedPost;
-    private PostRequestDTO postRequest;
     @Spy
     private PostMapper postMapper = Mappers.getMapper(PostMapper.class);
     @Spy
     private UserMapper userMapper = Mappers.getMapper(UserMapper.class);
+
+    private UserResponseDTO userDetails;
+    private Post savedPost;
+    private PostRequestDTO postRequest;
 
     @BeforeEach
     void setUp() {
@@ -63,8 +61,8 @@ class PostServiceTest {
     @DisplayName("Should create a post successfully.")
     void shouldCreatePost() {
         //Arrange
-        when(postRepository.save(any(Post.class))).thenReturn(savedPost);
         when(userService.findById(postRequest.userId())).thenReturn(userDetails);
+        when(postRepository.save(any(Post.class))).thenReturn(savedPost);
         //Act
         var result = postService.create(postRequest);
         //Assert
@@ -139,51 +137,6 @@ class PostServiceTest {
         assertTrue(postFound.isPresent());
         assertTrue(returnPost.isPresent());
         assertEquals(postFound.get().getId(), returnPost.get().id());
-    }
-
-    @Test
-    @DisplayName("Should find post with comments")
-    void shouldListPostWithComment() {
-        //Arrange
-        CommentResponseDTO savedComment = new CommentResponseDTO(UUID.randomUUID().toString(), "Muito bom, adorei o post!", Instant.now(), userDetails.id(), savedPost.getId());
-        CommentResponseDTO savedComment01 = new CommentResponseDTO(UUID.randomUUID().toString(), "Boa viagem mano!", Instant.now(), userDetails.id(), savedPost.getId());
-        CommentResponseDTO savedComment02 = new CommentResponseDTO(UUID.randomUUID().toString(), "Aproveite!", Instant.now(), userDetails.id(), savedPost.getId());
-        List<CommentResponseDTO> commentList = List.of(savedComment, savedComment01, savedComment02);
-        when(postRepository.findById(savedPost.getId())).thenReturn(Optional.of(savedPost));
-        when(userService.findById(savedPost.getUserId())).thenReturn(userDetails);
-        when(commentService.findByPostId(savedPost.getId())).thenReturn(commentList);
-        //Act
-        var result = postService.findWithComments(savedPost.getId());
-        //Assert
-        verify(postRepository).findById(savedPost.getId());
-        verify(userService).findById(savedPost.getUserId());
-        verify(commentService).findByPostId(savedPost.getId());
-        assertNotNull(result);
-        assertEquals(savedPost.getId(), result.post().id());
-        assertEquals(savedPost.getDate(), result.post().date());
-        assertEquals(savedPost.getTitle(), result.post().title());
-        assertEquals(savedPost.getBody(), result.post().body());
-        assertEquals(savedPost.getUserId(), result.post().user().id());
-        assertEquals(userDetails.id(), result.post().user().id());
-        assertEquals(userDetails.name(), result.post().user().name());
-        var commentsFound = commentList.stream().filter(comment -> savedPost.getId().equals(comment.postId())).findFirst();
-        var returnComments = result.comments().stream().filter(commentResponseDTO -> savedPost.getId().equals(commentResponseDTO.postId())).findFirst();
-        assertTrue(commentsFound.isPresent());
-        assertTrue(returnComments.isPresent());
-        assertEquals(commentsFound.get().id(), returnComments.get().id());
-        assertEquals(commentsFound.get().text(), returnComments.get().text());
-        assertEquals(commentsFound.get().date(), returnComments.get().date());
-        assertEquals(commentsFound.get().userId(), returnComments.get().userId());
-        assertEquals(commentsFound.get().postId(), returnComments.get().postId());
-    }
-
-    @Test
-    @DisplayName("Should throw exception if post with comments not found")
-    void shouldThrowExceptionIfPostWithCommentsNotFound() {
-        //Arrange
-        when(postRepository.findById(savedPost.getId())).thenReturn(Optional.empty());
-        //Act & Assert
-        assertThrows(ResourceNotFoundException.class, () -> postService.findWithComments(savedPost.getId()));
     }
 
     @Test
