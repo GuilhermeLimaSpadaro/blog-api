@@ -1,12 +1,11 @@
 package br.com.gspadaro.blogapi.service;
 
 import br.com.gspadaro.blogapi.dto.post.PostWithCommentsDTO;
-import br.com.gspadaro.blogapi.exception.ResourceNotFoundException;
 import br.com.gspadaro.blogapi.mapper.custom.PostMapper;
-import br.com.gspadaro.blogapi.mapper.custom.UserMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class PostQueryService {
@@ -25,6 +24,7 @@ public class PostQueryService {
     }
 
     //Buscar Post e os comentarios
+    @Transactional
     public PostWithCommentsDTO findWithComments(String postId) {
         logger.info("List all comments on a post. ID: {}", postId);
         var post = postService.findById(postId);

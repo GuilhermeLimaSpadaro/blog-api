@@ -9,6 +9,7 @@ import br.com.gspadaro.blogapi.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserService {
@@ -24,6 +25,7 @@ public class UserService {
         this.userMapper = userMapper;
     }
 
+    @Transactional
     public UserResponseDTO create(UserRequestDTO request) {
         logger.info("Create User.");
         User user = userMapper.toEntity(request);
@@ -32,6 +34,7 @@ public class UserService {
         return userMapper.toResponseDTO(savedUser);
     }
 
+    @Transactional
     public UserResponseDTO findById(String userId) {
         logger.info("Finding User. ID: {}", userId);
         User user = userRepository.findById(userId).orElseThrow(() -> {
@@ -42,6 +45,7 @@ public class UserService {
         return userMapper.toResponseDTO(user);
     }
 
+    @Transactional
     public UserResponseDTO update(String userId, UserRequestDTO request) {
         logger.info("Update User. ID: {}", userId);
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
@@ -51,6 +55,7 @@ public class UserService {
         return userMapper.toResponseDTO(updatedUser);
     }
 
+    @Transactional
     public void delete(String userId) {
         logger.info("User Delete. ID: {}", userId);
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
