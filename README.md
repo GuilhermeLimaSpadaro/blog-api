@@ -1,177 +1,272 @@
-# Blog API
+# 📝 Blog API
 
-API REST de blog para gerenciar usuários, posts e comentários, desenvolvida com Java e Spring Boot e persistência em
-MongoDB.
+API REST para gerenciamento de um blog, permitindo o cadastro e manipulação de **usuários**, **posts** e **comentários**. Desenvolvida com **Java 21** e **Spring Boot 4**, utilizando **MongoDB** como banco de dados NoSQL.
 
-## Tecnologias
+O projeto segue arquitetura em camadas (Controller → Service → Repository), padrão de mapeamento com **MapStruct**, tratamento centralizado de exceções e validação de dados com **Bean Validation**.
 
-* Java 21
-* Spring Boot 4.1.1
-* Spring Web
-* Spring Data MongoDB
-* MongoDB
-* Bean Validation / Jakarta Validation
-* MapStruct
-* JUnit 5
-* Mockito
-* Maven
+---
 
-## Funcionalidades
+## 🛠️ Tecnologias
 
-* Cadastro, consulta, atualização e remoção de usuários
-* Cadastro, consulta, atualização e remoção de posts
-* Cadastro, consulta, atualização e remoção de comentários
-* Posts vinculados ao usuário autor
-* Comentários vinculados ao usuário autor e ao post comentado
-* Consulta de um post junto com todos os seus comentários
-* Listagem dos posts de um usuário
-* Verificação de que o usuário e o post existem ao criar ou atualizar um comentário
-* Validação dos dados de entrada
-* Respostas de erro padronizadas
-* Dados sensíveis protegidos: a senha do usuário nunca é retornada pela API
-* Logs das principais operações
-* Testes unitários dos serviços
+| Tecnologia | Versão |
+|---|---|
+| Java | 21 |
+| Spring Boot | 4.1.1 |
+| Spring Web MVC | — |
+| Spring Data MongoDB | — |
+| MongoDB | 5.13.0 |
+| MapStruct | 1.6.3 |
+| Jakarta Validation | — |
+| JUnit 5 + Mockito | — |
+| Maven | — |
+| SLF4J (Logging) | — |
 
-## Modelo de domínio
+---
 
-```text
-User
- ├── Posts
- └── Comments
+## 📋 Funcionalidades
 
-Post
- ├── userId
- └── Comments
+### Usuários
+- Cadastro, consulta, atualização e remoção de usuários
+- Validação de nome, e-mail e telefone
+- Proteção de dados sensíveis: a senha **não** é retornada pela API
 
-Comment
- ├── userId
- └── postId
+### Posts
+- Cadastro, consulta, atualização e remoção de posts
+- Vinculação de posts ao usuário autor (`userId`)
+- Listagem de posts por usuário
+- Validação de título (máx. 200 caracteres), corpo e autor
+
+### Comentários
+- Cadastro, consulta, atualização e remoção de comentários
+- Vinculação de comentários ao usuário autor e ao post (`userId` + `postId`)
+- Verificação de existência do usuário e do post antes de criar/atualizar
+- Validação de texto (máx. 200 caracteres)
+
+### Geral
+- Consulta de post com todos os seus comentários em um único endpoint
+- Validação dos dados de entrada com Bean Validation
+- Tratamento centralizado de erros com respostas padronizadas
+- Logs estruturados das principais operações com SLF4J
+- Testes unitários da camada de serviço
+
+---
+
+## 🏗️ Arquitetura
+
+O projeto segue a arquitetura em camadas clássica do Spring Boot:
+
+```
+Client → Controller → Service → Repository → MongoDB
+                ↓
+            Mapper (MapStruct)
+                ↓
+              DTOs (Records)
 ```
 
-Os relacionamentos são guardados por IDs (`userId` e `postId`). Nas respostas, o post traz o `id` e o `name` do autor.
+### Camadas
+- **Controller**: expõe os endpoints REST e delega para os serviços
+- **Service**: contém a lógica de negócio e orquestra as operações
+- **Repository**: interface com o MongoDB via Spring Data
+- **Mapper**: converte entre DTOs e entidades usando MapStruct
+- **DTO**: registros (Records) para entrada e saída de dados
+- **Exception**: tratamento centralizado com `@RestControllerAdvice`
 
-## Estrutura
+### Modelo de domínio
+
+```text
+User (id, name, email, phone, password)
+ ├── Posts (referenciados por userId)
+ └── Comments (referenciados por userId)
+
+Post (id, date, title, body, userId)
+ ├── userId → referência ao autor
+ └── Comments (referenciados por postId)
+
+Comment (id, text, date, userId, postId)
+ ├── userId → referência ao autor
+ └── postId → referência ao post
+```
+
+Os relacionamentos são mantidos por **IDs de referência** (`userId` e `postId`). Nas respostas dos posts, o autor é retornado com `id` e `name`.
+
+### Estrutura do código
 
 ```text
 src/main/java/br/com/gspadaro/blogapi
-├── controller
-├── dto
-│   ├── comment
-│   ├── post
-│   └── user
-├── exception
-├── mapper
-│   └── custom
-├── model
-├── repository
-└── service
+├── BlogApiApplication.java          # Classe principal
+├── controller/                      # Controllers REST
+│   ├── UserController.java
+│   ├── PostController.java
+│   └── CommentController.java
+├── dto/                             # Data Transfer Objects (Records)
+│   ├── comment/
+│   │   ├── CommentRequestDTO.java
+│   │   └── CommentResponseDTO.java
+│   ├── post/
+│   │   ├── PostRequestDTO.java
+│   │   ├── PostResponseDTO.java
+│   │   └── PostWithCommentsDTO.java
+│   └── user/
+│       ├── UserRequestDTO.java
+│       ├── UserResponseDTO.java
+│       └── UserDetailsDTO.java
+├── exception/                       # Tratamento de exceções
+│   ├── GlobalHandlerException.java
+│   ├── ResourceNotFoundException.java
+│   └── StandardError.java
+├── mapper/                          # Mapeamento com MapStruct
+│   ├── ObjectMapper.java            # Interface base genérica
+│   └── custom/
+│       ├── UserMapper.java
+│       ├── PostMapper.java
+│       └── CommentMapper.java
+├── model/                           # Entidades MongoDB
+│   ├── User.java
+│   ├── Post.java
+│   └── Comment.java
+├── repository/                      # Repositórios Spring Data
+│   ├── UserRepository.java
+│   ├── PostRepository.java
+│   └── CommentRepository.java
+└── service/                         # Lógica de negócio
+    ├── UserService.java
+    ├── PostService.java
+    ├── PostQueryService.java
+    └── CommentService.java
 ```
 
-## Endpoints
+---
+
+## 🔌 Endpoints
 
 ### Users
 
-| Método | Endpoint             | Descrição           |
-|--------|----------------------|---------------------|
-| POST   | `/api/v1/users`      | Cria um usuário     |
-| GET    | `/api/v1/users/{id}` | Busca um usuário    |
-| PUT    | `/api/v1/users/{id}` | Atualiza um usuário |
-| DELETE | `/api/v1/users/{id}` | Remove um usuário   |
+| Método | Endpoint             | Descrição              | Status |
+|--------|----------------------|------------------------|--------|
+| POST   | `/api/v1/users`      | Criar usuário          | 201    |
+| GET    | `/api/v1/users/{id}` | Buscar usuário por ID  | 200    |
+| PUT    | `/api/v1/users/{id}` | Atualizar usuário      | 200    |
+| DELETE | `/api/v1/users/{id}` | Remover usuário        | 204    |
 
 ### Posts
 
-| Método | Endpoint                      | Descrição                                               |
-|--------|-------------------------------|---------------------------------------------------------|
-| POST   | `/api/v1/posts`               | Cria um post                                            |
-| GET    | `/api/v1/posts/{id}`          | Busca um post                                           |
-| GET    | `/api/v1/posts/{id}/comments` | Busca um post com seus comentários                      |
-| GET    | `/api/v1/posts/users/{id}`    | Lista os posts de um usuário (`{id}` é o ID do usuário) |
-| PUT    | `/api/v1/posts/{id}`          | Atualiza um post                                        |
-| DELETE | `/api/v1/posts/{id}`          | Remove um post                                          |
+| Método | Endpoint                      | Descrição                                      | Status |
+|--------|-------------------------------|------------------------------------------------|--------|
+| POST   | `/api/v1/posts`               | Criar post                                     | 201    |
+| GET    | `/api/v1/posts/{id}`          | Buscar post por ID                             | 200    |
+| GET    | `/api/v1/posts/{id}/comments` | Buscar post com seus comentários               | 200    |
+| GET    | `/api/v1/posts/users/{id}`    | Listar posts por usuário                       | 200    |
+| PUT    | `/api/v1/posts/{id}`          | Atualizar post                                 | 200    |
+| DELETE | `/api/v1/posts/{id}`          | Remover post                                   | 204    |
 
 ### Comments
 
-| Método | Endpoint                | Descrição              |
-|--------|-------------------------|------------------------|
-| POST   | `/api/v1/comments`      | Cria um comentário     |
-| GET    | `/api/v1/comments/{id}` | Busca um comentário    |
-| PUT    | `/api/v1/comments/{id}` | Atualiza um comentário |
-| DELETE | `/api/v1/comments/{id}` | Remove um comentário   |
+| Método | Endpoint                | Descrição                | Status |
+|--------|-------------------------|--------------------------|--------|
+| POST   | `/api/v1/comments`      | Criar comentário         | 201    |
+| GET    | `/api/v1/comments/{id}` | Buscar comentário por ID | 200    |
+| PUT    | `/api/v1/comments/{id}` | Atualizar comentário     | 200    |
+| DELETE | `/api/v1/comments/{id}` | Remover comentário       | 204    |
 
-## Validação
+---
 
-Os dados de entrada são validados com Bean Validation.
+## ✅ Validação
 
-* Usuário: nome, e-mail, telefone e senha obrigatórios; e-mail válido e senha com no mínimo 8 caracteres.
-* Post: título, corpo e `userId` obrigatórios.
-* Comentário: texto, `userId` e `postId` obrigatórios. O usuário e o post informados precisam existir.
+Os dados de entrada são validados com **Bean Validation** (Jakarta Validation):
 
-## Tratamento de erros
+| Entidade | Regras |
+|----------|--------|
+| **User** | `name` obrigatório, `email` obrigatório e válido, `phone` obrigatório (máx. 11 caracteres) |
+| **Post** | `title` obrigatório (máx. 200 caracteres), `body` obrigatório, `userId` obrigatório |
+| **Comment** | `text` obrigatório (máx. 200 caracteres), `userId` obrigatório, `postId` obrigatório |
 
-As exceções são tratadas de forma centralizada com `@RestControllerAdvice`.
+> **⚠️ Nota:** O campo `password` foi temporariamente removido do `UserRequestDTO`. Ele será reimplementado quando a autenticação e autorização com **Spring Security + JWT** forem adicionadas ao projeto.
 
-Principais respostas:
+Ao criar ou atualizar um comentário, o sistema verifica se o usuário e o post referenciados existem.
 
-* `404 Not Found` para recurso inexistente (usuário, post ou comentário)
-* `400 Bad Request` para argumentos inválidos
-* `500 Internal Server Error` para `NullPointerException`
-* Resposta padronizada com timestamp, status, erro, mensagem e caminho da requisição
+---
 
-## Como executar
+## 🚨 Tratamento de Erros
+
+Exceções tratadas centralmente via `@RestControllerAdvice` (`GlobalHandlerException`):
+
+| Exceção | Status | Descrição |
+|---------|--------|-----------|
+| `ResourceNotFoundException` | 404 | Recurso não encontrado (usuário, post ou comentário) |
+| `IllegalArgumentException` | 400 | Argumento inválido |
+| `NullPointerException` | 500 | Erro interno do servidor |
+
+Todas as respostas de erro seguem o formato padronizado:
+
+```json
+{
+  "timestamp": "2025-01-01T00:00:00Z",
+  "status": 404,
+  "error": "Resource not found",
+  "message": "User not found",
+  "path": "/api/v1/users/abc123"
+}
+```
+
+---
+
+## 🚀 Como Executar
 
 ### Pré-requisitos
 
-* Java 21
-* Maven
-* MongoDB em execução em `localhost:27017`
+- **Java 21**
+- **Maven 3.8+**
+- **MongoDB** rodando em `localhost:27017`
 
 ### Configuração
 
-O perfil `local` vem ativo por padrão (`application-local.yml`) e conecta em `mongodb://localhost:27017/blog_db`. As
-credenciais são lidas de variáveis de ambiente:
+O perfil ativo por padrão é `local` (definido em `application.yml`). Configure as credenciais do MongoDB via variáveis de ambiente:
 
+**Linux / macOS:**
 ```bash
 export MONGODB_USERNAME=seu_usuario
 export MONGODB_PASSWORD=sua_senha
 ```
 
-No Windows (PowerShell):
-
+**Windows (PowerShell):**
 ```powershell
 $env:MONGODB_USERNAME="seu_usuario"
 $env:MONGODB_PASSWORD="sua_senha"
 ```
 
-### Executar
+### Executar a aplicação
 
 ```bash
 ./mvnw spring-boot:run
 ```
 
-A aplicação fica disponível em:
+A API estará disponível em:
 
-```text
+```
 http://localhost:8080
 ```
 
-### Testes
+### Executar os testes
 
 ```bash
 ./mvnw test
 ```
 
-Os testes unitários cobrem a camada de serviço (`UserService`, `PostService`, `PostQueryService` e `CommentService`) com
-JUnit 5 e Mockito, usando os mappers reais. O teste `contextLoads` sobe a aplicação completa e precisa do MongoDB
-disponível.
+Os testes unitários cobrem a camada de serviço (`UserService`, `PostService`, `PostQueryService` e `CommentService`) com **JUnit 5** e **Mockito**, utilizando os mappers reais do MapStruct. O teste `contextLoads` inicializa a aplicação completa e requer o MongoDB disponível.
 
-## Próximos passos
+---
 
-* Aumentar a cobertura de testes
-* Implementar autenticação e autorização com Spring Security/JWT
-* Adicionar documentação OpenAPI/Swagger
-* Implementar paginação e ordenação
-* Realizar deploy
+## 📌 Próximos Passos
 
-## Autor
+- [ ] Implementar autenticação e autorização com **Spring Security + JWT**
+- [ ] Adicionar documentação interativa com **OpenAPI / Swagger**
+- [ ] Implementar paginação e ordenação nos endpoints de listagem
+- [ ] Aumentar a cobertura de testes (integração e controller)
+- [ ] Configurar pipeline de CI/CD
+- [ ] Preparar containerização com **Docker**
+
+---
+
+## 👤 Autor
 
 **Guilherme Spadaro**
