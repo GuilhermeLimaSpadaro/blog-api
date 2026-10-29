@@ -4,8 +4,3 @@ spring:
 
   profiles:
     active: local
-
-logging:
-  level:
-    org.springframework.data.mongodb.core.MongoTemplate: DEBUG
-    br.com.gs.blogapi: DEBUG
