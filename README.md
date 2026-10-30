@@ -256,6 +256,12 @@ Os testes unitários cobrem a camada de serviço (`UserService`, `PostService`, 
 
 ---
 
+## 📌 Próximos Passos
+
+- [ ] Adicionar migração de esquema com **Flyway**
+
+---
+
 ## 👤 Autor
 
 **Guilherme Spadaro**
