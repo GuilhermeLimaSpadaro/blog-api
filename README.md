@@ -256,41 +256,6 @@ Os testes unitários cobrem a camada de serviço (`UserService`, `PostService`, 
 
 ---
 
-## 📌 Roadmap
-
-O projeto segue um roteiro de evolução organizado por fases de prioridade:
-
-### Fase 1 — Segurança 🔒
-- [ ] Implementar autenticação e autorização com **Spring Security + JWT**
-- [ ] Reimplementar o campo `password` no `UserRequestDTO` com hash (BCrypt)
-- [ ] Proteger endpoints com roles e permissões
-
-### Fase 2 — Documentação da API 📖
-- [ ] Adicionar documentação interativa com **OpenAPI / Swagger**
-- [ ] Configurar UI do Swagger para testes manuais dos endpoints
-
-### Fase 3 — Melhorias nos Endpoints 📄
-- [ ] Implementar paginação com `Pageable` nos endpoints de listagem
-- [ ] Implementar ordenação com `Sort` nos resultados
-- [ ] Adicionar filtros por data, título e autor
-
-### Fase 4 — Testes 🧪
-- [ ] Aumentar a cobertura de testes unitários
-- [ ] Adicionar testes de integração com **MongoDB Testcontainer**
-- [ ] Adicionar testes de controller com **MockMvc**
-
-### Fase 5 — Containerização 🐳
-- [ ] Criar `Dockerfile` multi-stage para a aplicação
-- [ ] Configurar `docker-compose.yml` com MongoDB e aplicação
-- [ ] Scripts de inicialização automatizada do ambiente
-
-### Fase 6 — CI/CD 🚀
-- [ ] Configurar pipeline de CI com **GitHub Actions**
-- [ ] Build automatizado e execução dos testes a cada push
-- [ ] Quality checks (Spotless, Checkstyle) no pipeline
-
----
-
 ## 👤 Autor
 
 **Guilherme Spadaro**
