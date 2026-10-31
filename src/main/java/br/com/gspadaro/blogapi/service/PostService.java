@@ -2,15 +2,14 @@ package br.com.gspadaro.blogapi.service;
 
 import br.com.gspadaro.blogapi.dto.post.PostRequestDTO;
 import br.com.gspadaro.blogapi.dto.post.PostResponseDTO;
-import br.com.gspadaro.blogapi.dto.post.PostWithCommentsDTO;
 import br.com.gspadaro.blogapi.exception.ResourceNotFoundException;
 import br.com.gspadaro.blogapi.mapper.custom.PostMapper;
 import br.com.gspadaro.blogapi.mapper.custom.UserMapper;
-import br.com.gspadaro.blogapi.repository.CommentRepository;
 import br.com.gspadaro.blogapi.repository.PostRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -32,15 +31,17 @@ public class PostService {
         this.userService = userService;
     }
 
+    @Transactional
     public PostResponseDTO create(PostRequestDTO request) {
         logger.info("Create Post");
         var post = postMapper.toEntity(request);
         var user = userService.findById(post.getUserId());
         var savedPost = postRepository.save(post);
-        logger.info("Post successfully created. PostID: {}, AuthorID: {}", post.getId(), user.id());
+        logger.info("Post successfully created. PostID: {}, AuthorID: {}", savedPost.getId(), user.id());
         return postMapper.toResponseDTO(savedPost, userMapper.toDetailsDTO(user));
     }
 
+    @Transactional
     public PostResponseDTO findById(String postId) {
         logger.info("Finding Post. ID: {}", postId);
         var post = postRepository.findById(postId).orElseThrow(() -> {
@@ -53,6 +54,7 @@ public class PostService {
     }
 
     //Buscar post através do id do Usuário.
+    @Transactional
     public List<PostResponseDTO> findByUserId(String userId) {
         logger.info("Finding Post by user id. ID: {}", userId);
         var user = userService.findById(userId);
@@ -61,6 +63,7 @@ public class PostService {
         return postList.stream().map(post -> postMapper.toResponseDTO(post, userMapper.toDetailsDTO(user))).toList();
     }
 
+    @Transactional
     public PostResponseDTO update(String postId, PostRequestDTO request) {
         logger.info("Update Post. ID: {}", postId);
         var post = postRepository.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post not found"));
@@ -71,6 +74,7 @@ public class PostService {
         return postMapper.toResponseDTO(updatedPost, userMapper.toDetailsDTO(user));
     }
 
+    @Transactional
     public void delete(String postId) {
         logger.info("Post Delete. ID: {}", postId);
         var post = postRepository.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post not found"));

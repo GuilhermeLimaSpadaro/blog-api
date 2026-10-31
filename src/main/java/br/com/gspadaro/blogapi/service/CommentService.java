@@ -8,6 +8,7 @@ import br.com.gspadaro.blogapi.repository.CommentRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -29,6 +30,7 @@ public class CommentService {
         this.postService = postService;
     }
 
+    @Transactional
     public CommentResponseDTO create(CommentRequestDTO request) {
         logger.info("Create comment.");
         userService.findById(request.userId());
@@ -39,6 +41,7 @@ public class CommentService {
         return commentMapper.toResponseDTO(savedComment);
     }
 
+    @Transactional
     public CommentResponseDTO findById(String commentId) {
         logger.info("Finding Comment. ID: {}", commentId);
         var comment = commentRepository.findById(commentId).orElseThrow(() -> {
@@ -49,6 +52,7 @@ public class CommentService {
         return commentMapper.toResponseDTO(comment);
     }
 
+    @Transactional
     public List<CommentResponseDTO> findByPostId(String postId) {
         logger.info("Finding all Comments of post, ID: {}", postId);
         var commentList = commentRepository.findByPostId(postId);
@@ -56,6 +60,7 @@ public class CommentService {
         return commentMapper.toResponseListDTO(commentList);
     }
 
+    @Transactional
     public CommentResponseDTO update(String commentId, CommentRequestDTO request) {
         logger.info("Update comment. ID: {}", commentId);
         var comment = commentRepository.findById(commentId).orElseThrow(() -> new ResourceNotFoundException("Comment not found"));
@@ -67,6 +72,7 @@ public class CommentService {
         return commentMapper.toResponseDTO(updatedComment);
     }
 
+    @Transactional
     public void delete(String commentId) {
         logger.info("Delete comment. ID: {}", commentId);
         var comment = commentRepository.findById(commentId).orElseThrow(() -> new ResourceNotFoundException("Comment not found"));
