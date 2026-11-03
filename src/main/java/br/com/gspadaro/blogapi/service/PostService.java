@@ -43,42 +43,48 @@ public class PostService {
 
     @Transactional
     public PostResponseDTO findById(String postId) {
-        logger.info("Finding Post. ID: {}", postId);
+        logger.info("Finding Post.");
         var post = postRepository.findById(postId).orElseThrow(() -> {
-            logger.warn("Post not found. ID: {}", postId);
-            return new ResourceNotFoundException("Post not found");
+            logger.warn("Post not found on findById. ID: {}", postId);
+            return new ResourceNotFoundException("User not found with ID: " + postId);
         });
-        logger.info("Post successfully found.");
         var user = userService.findById(post.getUserId());
+        logger.info("Post successfully found. ID: {}", postId);
         return postMapper.toResponseDTO(post, userMapper.toDetailsDTO(user));
     }
 
     //Buscar post através do id do Usuário.
     @Transactional
     public List<PostResponseDTO> findByUserId(String userId) {
-        logger.info("Finding Post by user id. ID: {}", userId);
+        logger.info("Finding Post by user id.");
         var user = userService.findById(userId);
         var postList = postRepository.findByUserId(user.id());
-        logger.info("Post successfully found with user id.");
+        logger.info("Post successfully found. UserID: {}", userId);
         return postList.stream().map(post -> postMapper.toResponseDTO(post, userMapper.toDetailsDTO(user))).toList();
     }
 
     @Transactional
     public PostResponseDTO update(String postId, PostRequestDTO request) {
-        logger.info("Update Post. ID: {}", postId);
-        var post = postRepository.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post not found"));
+        logger.info("Update Post.");
+        var post = postRepository.findById(postId).orElseThrow(() -> {
+            logger.warn("Post not found on update. ID: {}", postId);
+            return new ResourceNotFoundException("Post not found with ID: " + postId);
+        });
         var user = userService.findById(post.getUserId());
         postMapper.toUpdateEntity(request, post);
         var updatedPost = postRepository.save(post);
-        logger.info("Post successfully updated.");
+        logger.info("User successfully updated. ID: {}", postId);
         return postMapper.toResponseDTO(updatedPost, userMapper.toDetailsDTO(user));
     }
 
     @Transactional
     public void delete(String postId) {
-        logger.info("Post Delete. ID: {}", postId);
-        var post = postRepository.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post not found"));
+        logger.info("Post Delete.");
+        var post = postRepository.findById(postId).orElseThrow(() -> {
+            logger.warn("Post not found on delete. ID: {}", postId);
+            return new ResourceNotFoundException("Post not found with ID: " + postId);
+        });
         postRepository.delete(post);
-        logger.info("Post successfully deleted");
+        logger.info("Post successfully deleted. ID: {}", postId);
     }
 }

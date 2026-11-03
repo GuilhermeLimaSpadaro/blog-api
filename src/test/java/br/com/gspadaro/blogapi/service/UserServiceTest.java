@@ -42,7 +42,7 @@ class UserServiceTest {
     @BeforeEach
     void setUp() {
         savedUser = new User(UUID.randomUUID().toString(), "Guilherme", "guilhermespadaro@gmail.com", "11955447766", "13ABC234");
-        requestUser = new UserRequestDTO("Bob Grey", "bob@gmail.com", "22222", "11111");
+        requestUser = new UserRequestDTO("Bob Grey", "bob@gmail.com", "2222211111");
     }
 
     @Test

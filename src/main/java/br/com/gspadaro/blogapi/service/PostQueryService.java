@@ -26,10 +26,10 @@ public class PostQueryService {
     //Buscar Post e os comentarios
     @Transactional
     public PostWithCommentsDTO findWithComments(String postId) {
-        logger.info("List all comments on a post. ID: {}", postId);
+        logger.info("List all comments on a post.");
         var post = postService.findById(postId);
         var commentsList = commentService.findByPostId(postId);
-        logger.info("The post and its comments were successfully found.");
+        logger.info("The post and its comments were successfully found. PostID: {}", postId);
         return postMapper.toPostCommentsDTO(post, commentsList);
     }
 }

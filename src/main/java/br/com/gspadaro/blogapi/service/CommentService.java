@@ -43,40 +43,46 @@ public class CommentService {
 
     @Transactional
     public CommentResponseDTO findById(String commentId) {
-        logger.info("Finding Comment. ID: {}", commentId);
+        logger.info("Finding Comment.");
         var comment = commentRepository.findById(commentId).orElseThrow(() -> {
-            logger.warn("Comment not found. ID: {}", commentId);
-            return new ResourceNotFoundException("Comment not found");
+            logger.warn("Comment not found on findById. ID: {}", commentId);
+            return new ResourceNotFoundException("Comment not found with ID: " + commentId);
         });
-        logger.info("Comment successfully found.");
+        logger.info("Post successfully found. ID: {}", commentId);
         return commentMapper.toResponseDTO(comment);
     }
 
     @Transactional
     public List<CommentResponseDTO> findByPostId(String postId) {
-        logger.info("Finding all Comments of post, ID: {}", postId);
+        logger.info("Finding all Comments of post.");
         var commentList = commentRepository.findByPostId(postId);
-        logger.info("Post comments successfully found.");
+        logger.info("Post comments successfully found. ID: {}", postId);
         return commentMapper.toResponseListDTO(commentList);
     }
 
     @Transactional
     public CommentResponseDTO update(String commentId, CommentRequestDTO request) {
-        logger.info("Update comment. ID: {}", commentId);
-        var comment = commentRepository.findById(commentId).orElseThrow(() -> new ResourceNotFoundException("Comment not found"));
+        logger.info("Update comment.");
+        var comment = commentRepository.findById(commentId).orElseThrow(() -> {
+            logger.warn("Comment not found on update. ID: {}", commentId);
+            return new ResourceNotFoundException("Comment not found with ID: " + commentId);
+        });
         userService.findById(request.userId());
         postService.findById(request.postId());
         commentMapper.toUpdateEntity(request, comment);
         var updatedComment = commentRepository.save(comment);
-        logger.info("Comment successfully updated");
+        logger.info("Comment successfully updated. ID: {}", commentId);
         return commentMapper.toResponseDTO(updatedComment);
     }
 
     @Transactional
     public void delete(String commentId) {
-        logger.info("Delete comment. ID: {}", commentId);
-        var comment = commentRepository.findById(commentId).orElseThrow(() -> new ResourceNotFoundException("Comment not found"));
+        logger.info("Delete comment.");
+        var comment = commentRepository.findById(commentId).orElseThrow(() -> {
+            logger.warn("Comment not found on delete. ID: {}", commentId);
+            return new ResourceNotFoundException("Comment not found with ID: " + commentId);
+        });
         commentRepository.delete(comment);
-        logger.info("Comment successfully deleted.");
+        logger.info("Comment successfully deleted. ID: {}", commentId);
     }
 }

@@ -15,9 +15,11 @@ public interface UserMapper extends ObjectMapper<User, UserRequestDTO, UserRespo
     UserDetailsDTO toDetailsDTO(UserResponseDTO user);
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "password", ignore = true)
     User toEntity(UserRequestDTO user);
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "password", ignore = true)
     @Override
     void toUpdateEntity(UserRequestDTO request, @MappingTarget User entity);
 }

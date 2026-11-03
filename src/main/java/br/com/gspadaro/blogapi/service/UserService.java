@@ -36,30 +36,36 @@ public class UserService {
 
     @Transactional
     public UserResponseDTO findById(String userId) {
-        logger.info("Finding User. ID: {}", userId);
+        logger.info("Finding User.");
         User user = userRepository.findById(userId).orElseThrow(() -> {
-            logger.warn("User not found. ID: {}", userId);
-            return new ResourceNotFoundException("User not found");
+            logger.warn("User not found on findById. ID: {}", userId);
+            return new ResourceNotFoundException("User not found with ID: " + userId);
         });
-        logger.info("User successfully found.");
+        logger.info("User successfully found. ID: {}", userId);
         return userMapper.toResponseDTO(user);
     }
 
     @Transactional
     public UserResponseDTO update(String userId, UserRequestDTO request) {
-        logger.info("Update User. ID: {}", userId);
-        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        logger.info("Update User.");
+        User user = userRepository.findById(userId).orElseThrow(() -> {
+            logger.warn("User not found on update. ID: {}", userId);
+            return new ResourceNotFoundException("User not found with ID: " + userId);
+        });
         userMapper.toUpdateEntity(request, user);
         User updatedUser = userRepository.save(user);
-        logger.info("User successfully updated");
+        logger.info("User successfully updated. ID: {}", userId);
         return userMapper.toResponseDTO(updatedUser);
     }
 
     @Transactional
     public void delete(String userId) {
-        logger.info("User Delete. ID: {}", userId);
-        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        logger.info("User Delete.");
+        User user = userRepository.findById(userId).orElseThrow(() -> {
+            logger.warn("User not found on delete. ID: {}", userId);
+            return new ResourceNotFoundException("User not found with ID: " + userId);
+        });
         userRepository.delete(user);
-        logger.info("User successfully deleted.");
+        logger.info("User successfully deleted. ID: {}", userId);
     }
 }
