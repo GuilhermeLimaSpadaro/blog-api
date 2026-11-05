@@ -1,139 +1,284 @@
-# Blog API
+<div align="center">
+
+# 📝 Blog API
+
+[![Java](https://img.shields.io/badge/Java-21-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://openjdk.java.net/)
+[![Spring Boot](https://img.shields.io/badge/Spring_Boot-4.1.2-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
+[![Build](https://img.shields.io/badge/Build-Maven-C71A36?style=for-the-badge&logo=apachemaven&logoColor=white)](https://maven.apache.org/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-7.0-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
 
 API REST para gerenciamento de um blog, permitindo o cadastro e manipulação de **usuários**, **posts** e **comentários**.
 
-Desenvolvida com **Java 21** e **Spring Boot 4**, utilizando **MongoDB** como banco de dados NoSQL.
+[Funcionalidades](#-funcionalidades) •
+[Arquitetura](#-arquitetura) •
+[Endpoints](#-endpoints) •
+[Como Executar](#-como-executar) •
+[Padrões Adotados](#-padr%C3%B5es-adotados)
+
+</div>
 
 ---
 
-## Tecnologias
+## 📖 Sobre o Projeto
 
-- **Java 21**
-- **Spring Boot 4.1.2**
-- **Spring Data MongoDB**
-- **MapStruct 1.6.3**
-- **Jakarta Validation**
-- **JUnit 5 + Mockito**
+**Blog API** é uma API RESTful construída com **Java 21** e **Spring Boot 4.1.2** que gerencia o ciclo completo de um blog, desde o cadastro de usuários até a criação de posts e comentários.
+
+O projeto segue uma arquitetura em camadas, separando claramente as responsabilidades entre controllers, services, repositories e mappers, com uso de DTOs para isolamento da camada de persistência e validação robusta dos dados de entrada. Utiliza **MongoDB** como banco de dados NoSQL, aproveitando a flexibilidade de schemas e o modelo de documentos orientado.
 
 ---
 
-## Funcionalidades
+## 🛠 Tecnologias
 
-### Usuários
-- Cadastro, consulta, atualização e remoção
-- Validação de nome, e-mail e telefone
-- Senha não é retornada pela API
-
-### Posts
-- Cadastro, consulta, atualização e remoção
-- Vinculação ao usuário autor via `userId`
-- Listagem de posts por usuário
-
-### Comentários
-- Cadastro, consulta, atualização e remoção
-- Vinculação ao usuário autor e ao post via `userId` + `postId`
-- Verificação de existência do usuário e do post antes de criar/atualizar
-
-### Geral
-- Consulta de post com todos os comentários em um único endpoint
-- Validação de entrada com Bean Validation
-- Tratamento centralizado de erros
-- Testes unitários da camada de serviço
+| Categoria | Tecnologia | Versão |
+|---|---|---|
+| **Linguagem** | Java | 21 |
+| **Framework** | Spring Boot | 4.1.2 |
+| **Web** | Spring Web MVC | — |
+| **Banco de Dados** | MongoDB | 7.0 |
+| **Data Access** | Spring Data MongoDB | — |
+| **Mapper** | MapStruct | 1.6.3 |
+| **Validação** | Jakarta Validation | — |
+| **Testes** | JUnit 5 + Mockito | — |
+| **Build** | Maven | — |
+| **Servidor** | Apache Tomcat | 11.0.27 |
 
 ---
 
-## Arquitetura
+## ✨ Funcionalidades
+
+- ✅ **Usuários** — Cadastro, consulta, atualização e remoção
+- ✅ **Posts** — CRUD completo com título, corpo, data e vinculação ao autor
+- ✅ **Comentários** — CRUD completo com vinculação ao post e ao autor
+- ✅ **Posts por Usuário** — Listagem de todos os posts de um usuário específico
+- ✅ **Post com Comentários** — Consulta de um post com todos os seus comentários em um único endpoint
+- ✅ **Validação** — Validação de dados com Jakarta Validation em todos os endpoints
+- ✅ **Tratamento de Erros** — Handler global com respostas padronizadas em JSON
+- ✅ **Testes Unitários** — Cobertura dos services com JUnit 5 e Mockito
+- ✅ **Versionamento** — API versionada com prefixo `/api/v1`
+
+---
+
+## 🏗 Arquitetura
+
+### Diagrama de Camadas
 
 ```
-Client → Controller → Service → Repository → MongoDB
+┌─────────────────────────────────────────────────────────────┐
+│                     Client (HTTP)                           │
+└──────────────────────────┬──────────────────────────────────┘
+                           │
+                           ▼
+┌─────────────────────────────────────────────────────────────┐
+│                  Controller Layer                           │
+│  @RestController • @Valid • ResponseEntity                 │
+│  UserController • PostController • CommentController       │
+└──────────────────────────┬──────────────────────────────────┘
+                           │
+                           ▼
+┌─────────────────────────────────────────────────────────────┐
+│                    Service Layer                            │
+│  @Service • Lógica de negócio                              │
+│  UserService • PostService • PostQueryService              │
+│  CommentService                                            │
+└──────────────────────────┬──────────────────────────────────┘
+                           │
+                           ▼
+┌─────────────────────────────────────────────────────────────┐
+│                     Mapper Layer                            │
+│  MapStruct • DTO ↔ Entity conversion                      │
+│  UserMapper • PostMapper • CommentMapper                  │
+└──────────────────────────┬──────────────────────────────────┘
+                           │
+                           ▼
+┌─────────────────────────────────────────────────────────────┐
+│                  Repository Layer                           │
+│  Spring Data MongoDB                                       │
+│  UserRepository • PostRepository • CommentRepository       │
+└──────────────────────────┬──────────────────────────────────┘
+                           │
+                           ▼
+┌─────────────────────────────────────────────────────────────┐
+│                    Database (MongoDB)                       │
+└─────────────────────────────────────────────────────────────┘
 ```
 
-### Camadas
-- **Controller** — endpoints REST
-- **Service** — lógica de negócio
-- **Repository** — acesso ao MongoDB via Spring Data
-- **Mapper** — conversão entre DTOs e entidades (MapStruct)
-- **DTO** — records para entrada e saída de dados
-- **Exception** — tratamento centralizado com `@RestControllerAdvice`
-
-### Modelo de domínio
+### Modelo de Domínio
 
 ```
-User (id, name, email, phone, password)
-  ├── Posts (referenciados por userId)
-  └── Comments (referenciados por userId)
+┌──────────┐         ┌──────────┐         ┌──────────┐
+│  User    │────1:N──│  Post    │────1:N──│ Comment  │
+│          │         │          │         │          │
+│  _id     │         │  _id     │         │  _id     │
+│  name    │         │  date    │         │  text    │
+│  email   │         │  title   │         │  date    │
+│  phone   │         │  body    │         │  userId  │
+│  password│         │  userId  │         │  postId  │
+└──────────┘         └──────────┘         └──────────┘
 
-Post (id, date, title, body, userId)
-  ├── userId → referência ao autor
-  └── Comments (referenciados por postId)
+Relacionamentos:
+  User → Post (userId)
+  Post → Comment (postId)
+  User → Comment (userId)
+```
 
-Comment (id, text, date, userId, postId)
-  ├── userId → referência ao autor
-  └── postId → referência ao post
+### Relacionamentos
+
+| Relação | Tipo | Descrição |
+|---|---|---|
+| `User` → `Post` | OneToMany | Um usuário pode ter vários posts (referenciado por `userId`) |
+| `User` → `Comment` | OneToMany | Um usuário pode ter vários comentários (referenciado por `userId`) |
+| `Post` → `Comment` | OneToMany | Um post pode ter vários comentários (referenciado por `postId`) |
+
+---
+
+## 📁 Estrutura do Projeto
+
+```
+src/main/java/br/com/gspadaro/blogapi/
+├── controller/           # Endpoints REST
+│   ├── UserController.java
+│   ├── PostController.java
+│   └── CommentController.java
+├── dto/                  # Objetos de transferência (records)
+│   ├── comment/
+│   │   ├── CommentRequestDTO.java
+│   │   └── CommentResponseDTO.java
+│   ├── post/
+│   │   ├── PostRequestDTO.java
+│   │   └── PostResponseDTO.java
+│   └── user/
+│       ├── UserRequestDTO.java
+│       └── UserResponseDTO.java
+├── exception/            # Tratamento global de exceções
+│   ├── GlobalHandlerException.java
+│   ├── ResourceNotFoundException.java
+│   └── StandardError.java
+├── mapper/               # Conversão entre entidades e DTOs
+│   ├── ObjectMapper.java          # Interface base genérica
+│   └── custom/
+│       ├── UserMapper.java
+│       ├── PostMapper.java
+│       └── CommentMapper.java
+├── model/                # Entidades MongoDB
+│   ├── User.java
+│   ├── Post.java
+│   └── Comment.java
+├── repository/           # Persistência com Spring Data MongoDB
+│   ├── UserRepository.java
+│   ├── PostRepository.java
+│   └── CommentRepository.java
+├── service/              # Regras de negócio
+│   ├── UserService.java
+│   ├── PostService.java
+│   ├── PostQueryService.java
+│   └── CommentService.java
+└── BlogApiApplication.java
 ```
 
 ---
 
-## Endpoints
+## 🔌 Endpoints
+
+> **Base URL:** `http://localhost:8080/api/v1`
 
 ### Users
 
 | Método | Endpoint | Descrição |
-|--------|----------|-----------|
-| POST | `/api/v1/users` | Criar usuário |
-| GET | `/api/v1/users/{id}` | Buscar por ID |
-| PUT | `/api/v1/users/{id}` | Atualizar |
-| DELETE | `/api/v1/users/{id}` | Remover |
+|---|---|---|
+| `POST` | `/api/v1/users` | Cria um usuário |
+| `GET` | `/api/v1/users/{id}` | Busca um usuário por ID |
+| `PUT` | `/api/v1/users/{id}` | Atualiza um usuário |
+| `DELETE` | `/api/v1/users/{id}` | Remove um usuário |
 
 ### Posts
 
 | Método | Endpoint | Descrição |
-|--------|----------|-----------|
-| POST | `/api/v1/posts` | Criar post |
-| GET | `/api/v1/posts/{id}` | Buscar por ID |
-| GET | `/api/v1/posts/users/{id}` | Listar por usuário |
-| GET | `/api/v1/posts/{id}/comments` | Post com comentários |
-| PUT | `/api/v1/posts/{id}` | Atualizar |
-| DELETE | `/api/v1/posts/{id}` | Remover |
+|---|---|---|
+| `POST` | `/api/v1/posts` | Cria um post |
+| `GET` | `/api/v1/posts/{id}` | Busca um post por ID |
+| `GET` | `/api/v1/posts/users/{id}` | Lista posts de um usuário |
+| `GET` | `/api/v1/posts/{id}/comments` | Busca post com comentários |
+| `PUT` | `/api/v1/posts/{id}` | Atualiza um post |
+| `DELETE` | `/api/v1/posts/{id}` | Remove um post |
 
 ### Comments
 
 | Método | Endpoint | Descrição |
-|--------|----------|-----------|
-| POST | `/api/v1/comments` | Criar comentário |
-| GET | `/api/v1/comments/{id}` | Buscar por ID |
-| PUT | `/api/v1/comments/{id}` | Atualizar |
-| DELETE | `/api/v1/comments/{id}` | Remover |
+|---|---|---|
+| `POST` | `/api/v1/comments` | Cria um comentário |
+| `GET` | `/api/v1/comments/{id}` | Busca um comentário por ID |
+| `PUT` | `/api/v1/comments/{id}` | Atualiza um comentário |
+| `DELETE` | `/api/v1/comments/{id}` | Remove um comentário |
 
 ---
 
-## Validação
+## 📝 Exemplos de Request
 
-| Entidade | Regras |
-|----------|--------|
-| **User** | `name` obrigatório, `email` obrigatório e válido, `phone` obrigatório (máx. 11) |
-| **Post** | `title` obrigatório (máx. 200), `body` obrigatório, `userId` obrigatório |
-| **Comment** | `text` obrigatório (máx. 200), `userId` obrigatório, `postId` obrigatório |
+### Criar Usuário
 
-> **Nota:** O campo `password` não está no `UserRequestDTO`. A autenticação com **Spring Security + JWT** está planejada para uma próxima versão.
+```bash
+curl -X POST http://localhost:8080/api/v1/users \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Guilherme Spadaro",
+    "email": "guilherme@email.com",
+    "phone": "11999999999"
+  }'
+```
+
+### Criar Post
+
+```bash
+curl -X POST http://localhost:8080/api/v1/posts \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Primeiro Post",
+    "body": "Conteúdo do meu primeiro post no blog.",
+    "userId": "64f1a2b3c4d5e6f7g8h9i0j1"
+  }'
+```
+
+### Criar Comentário
+
+```bash
+curl -X POST http://localhost:8080/api/v1/comments \
+  -H "Content-Type: application/json" \
+  -d '{
+    "text": "Ótimo post!",
+    "userId": "64f1a2b3c4d5e6f7g8h9i0j1",
+    "postId": "64f1a2b3c4d5e6f7g8h9i0j2"
+  }'
+```
 
 ---
 
-## Tratamento de Erros
+## ✅ Validações
 
-Exceções tratadas via `@RestControllerAdvice`:
+Os DTOs de request possuem validações com **Jakarta Validation**:
 
-| Exceção | Status |
-|---------|--------|
-| `ResourceNotFoundException` | 404 |
-| `IllegalArgumentException` | 400 |
-| `NullPointerException` | 500 |
+| DTO | Validações |
+|---|---|
+| `UserRequestDTO` | `name` (@NotBlank), `email` (@Email, @NotBlank), `phone` (@NotBlank, @Size max=11) |
+| `PostRequestDTO` | `title` (@NotBlank, @Size max=200), `body` (@NotBlank), `userId` (@NotBlank) |
+| `CommentRequestDTO` | `text` (@NotBlank, @Size max=200), `userId` (@NotBlank), `postId` (@NotBlank) |
 
-Resposta padronizada:
+---
+
+## 🚨 Tratamento de Exceções
+
+A API possui tratamento global de exceções com respostas padronizadas:
+
+| Exceção | Status HTTP | Descrição |
+|---|:---:|---|
+| `ResourceNotFoundException` | 404 | Recurso não encontrado |
+| `IllegalArgumentException` | 400 | Argumento inválido |
+| `NullPointerException` | 500 | Erro interno do servidor |
+
+### Exemplo de Resposta de Erro
 
 ```json
 {
-  "timestamp": "2025-01-01T00:00:00Z",
+  "timestamp": "2026-01-01T00:00:00Z",
   "status": 404,
   "error": "Resource not found",
   "message": "User not found",
@@ -143,29 +288,47 @@ Resposta padronizada:
 
 ---
 
-## Como Executar
+## ⚙️ Configuração
 
-### Pré-requisitos
-- **Java 21**
-- **Maven 3.8+**
-- **MongoDB** em `localhost:27017`
+O projeto utiliza **application.yml** para configuração:
 
-### Configuração
-
-Configure as credenciais do MongoDB via variáveis de ambiente:
-
-```bash
-export MONGODB_USERNAME=seu_usuario
-export MONGODB_PASSWORD=sua_senha
+```yaml
+spring:
+  application:
+    name: blog-api
+  data:
+    mongodb:
+      uri: mongodb://${MONGODB_USERNAME}:${MONGODB_PASSWORD}@localhost:27017/blog_db
 ```
 
-### Executar
+### Variáveis de Ambiente
+
+| Variável | Descrição |
+|---|---|
+| `MONGODB_USERNAME` | Usuário do MongoDB |
+| `MONGODB_PASSWORD` | Senha do MongoDB |
+
+---
+
+## 🚀 Como Executar
+
+### Pré-requisitos
+
+- **Java 21**
+- **Maven**
+- **MongoDB** rodando em `localhost:27017`
+
+### Rodar a Aplicação
 
 ```bash
 ./mvnw spring-boot:run
 ```
 
-A API fica disponível em `http://localhost:8080`.
+A API fica disponível em:
+
+```
+http://localhost:8080
+```
 
 ### Testes
 
@@ -181,16 +344,65 @@ A API fica disponível em `http://localhost:8080`.
 
 ---
 
-## Próximos Passos
+## 📐 Padrões Adotados
 
-- [ ] Autenticação e autorização com **Spring Security + JWT**
-- [ ] Campo `password` com criptografia
-- [ ] Testes de integração com **Testcontainers**
-- [ ] Documentação de API com **SpringDoc + OpenAPI 3**
-- [ ] Pipeline de CI/CD
+Este projeto segue práticas e convenções amplamente adotadas no mercado:
+
+### Arquitetura
+
+- **Camadas separadas** — Controller → Service → Mapper → Repository
+- **Injeção via construtor** — Imutabilidade e testabilidade
+- **DTOs com records** — Objetos imutáveis e concisos para transferência de dados
+- **MapStruct** — Mapeamento tipo-safe gerado em tempo de compilação
+- **Spring Data MongoDB** — Acesso ao banco com repositórios tipo-safe
+
+### Nomenclatura
+
+- **Coleções MongoDB** — Snake_case (`users`, `posts`, `comments`)
+- **Campos** — camelCase (`userId`, `postId`, `createdAt`)
+- **Classes Java** — PascalCase (`PostService`, `UserRequestDTO`)
+- **Variáveis** — camelCase (`postRepository`, `createdPost`)
+
+### REST
+
+- **Versionamento** — Prefixo `/api/v1` nos endpoints
+- **HTTP verbs** — POST (criar), GET (ler), PUT (atualizar), DELETE (remover)
+- **Status codes** — 200 (OK), 201 (Created), 204 (No Content), 400 (Bad Request), 404 (Not Found)
+- **URI de criação** — `Location` header com URI do recurso criado
+
+### Validação e Erros
+
+- **Jakarta Validation** — Validação declarativa nos DTOs
+- **Handler global** — Tratamento centralizado de exceções
+- **Resposta padronizada** — Estrutura JSON consistente para erros
+
+### Banco de Dados
+
+- **IDs** — ObjectId nativo do MongoDB (`@Id`)
+- **Relacionamentos** — Referências por ID (`userId`, `postId`) sem embed
+- **Timestamp** — Campo `date` como `Instant` para posts e comentários
 
 ---
 
-## Autor
+## 📅 Roadmap
+
+- [ ] **Spring Security** — Autenticação e autorização com JWT
+- [ ] **Criptografia de senhas** — BCrypt para armazenamento seguro
+- [ ] **Testes de integração** — Endpoints com Testcontainers
+- [ ] **OpenAPI/Swagger** — Documentação interativa da API
+- [ ] **Docker** — Containerização da aplicação e do MongoDB
+- [ ] **CI/CD** — Pipeline de integração contínua
+
+---
+
+## 👤 Autor
 
 **Guilherme Spadaro**
+
+---
+
+<div align="center">
+
+Feito com ❤️ usando Java 21 e Spring Boot 4.1.2
+
+</div>

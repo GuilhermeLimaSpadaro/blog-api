@@ -20,7 +20,6 @@ public class Post implements Serializable {
     private String body;
     private String userId;
 
-
     public Post() {
     }
 
